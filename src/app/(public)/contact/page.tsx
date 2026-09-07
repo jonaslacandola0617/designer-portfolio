@@ -1,11 +1,19 @@
 import { getSiteSettings } from "@/features/projects/queries";
 import { SocialLinks } from "@/components/public/portfolio";
 import { pageMetadata } from "@/lib/seo";
-export const metadata = pageMetadata(
-  "Contact",
-  "Contact for graphic-design enquiries.",
-  "/contact",
-);
+
+export async function generateMetadata() {
+  const s = await getSiteSettings();
+  const services = s.availableFor.slice(0, 3).join(", ");
+  return pageMetadata(
+    "Contact — Freelance & Creative Projects",
+    `Contact ${s.designerName} for ${services || "graphic design and creative projects"}.`,
+    "/contact",
+    s.socialImage,
+    `Contact ${s.designerName} — ${s.professionalTitle}`,
+  );
+}
+
 export default async function Contact() {
   const s = await getSiteSettings();
   return (
