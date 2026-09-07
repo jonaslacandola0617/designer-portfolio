@@ -104,8 +104,13 @@ test("admin publishing lifecycle, ordering, settings and logout", async ({
   const row = page
     .locator(".sortable-item")
     .filter({ has: page.getByRole("link", { name: title, exact: true }) });
-  page.once("dialog", (dialog) => dialog.accept(slug));
   await row.getByRole("button", { name: "Delete", exact: true }).click();
+  await expect(
+    page.getByRole("dialog", { name: "Delete project?" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Delete project", exact: true })
+    .click();
   await expect(
     page.getByRole("link", { name: title, exact: true }),
   ).toHaveCount(0);
