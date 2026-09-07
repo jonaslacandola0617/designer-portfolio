@@ -822,3 +822,154 @@ html:has(.register-admin) {
     justify-content: flex-start;
   }
 }
+
+
+/* Register-styled destructive confirmations. */
+.register-admin .dialog {
+  border-radius: 0;
+}
+.register-admin .confirm-dialog-body {
+  display: grid;
+  gap: var(--sp-4);
+}
+.register-admin .confirm-dialog-copy {
+  max-width: 46ch;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+.register-admin .confirm-dialog-copy p + p {
+  margin-top: var(--sp-3);
+}
+.register-admin .confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-3);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--line);
+}
+.register-admin .btn.confirm-danger {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.register-admin .btn.confirm-danger:hover {
+  background: var(--accent-deep);
+  border-color: var(--accent-deep);
+}
+.register-admin .btn.confirm-danger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Media library selection / bulk management. */
+.register-admin .media-library-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin: var(--sp-4) 0 var(--sp-4);
+  padding: var(--sp-3) 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.register-admin .media-library-count {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.register-admin .media-library-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+.register-admin .media-library-actions .text-action {
+  margin: 0;
+}
+.register-admin .media-library-actions .text-action[disabled] {
+  opacity: 0.3;
+  pointer-events: none;
+}
+.register-admin .media-delete-action {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.register-admin .media-tile {
+  border-radius: 0;
+}
+.register-admin .media-tile.is-selecting .m-actions {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+.register-admin .media-tile.is-selected {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+.register-admin .media-select-surface {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  background: transparent;
+}
+.register-admin .media-select-surface:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+.register-admin .media-selection-mark {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  background: var(--paper);
+  color: var(--accent);
+  border: 1px solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  line-height: 1;
+}
+.register-admin .media-tile.is-selected .media-selection-mark {
+  background: var(--accent);
+  color: var(--paper);
+  border-color: var(--accent);
+}
+.register-admin .media-in-use {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 4;
+  padding: 5px 7px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+
+@media (max-width: 640px) {
+  .register-admin .confirm-dialog-actions,
+  .register-admin .media-library-bar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .register-admin .confirm-dialog-actions {
+    justify-content: flex-start;
+  }
+  .register-admin .confirm-dialog-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  .register-admin .media-library-actions {
+    justify-content: flex-start;
+  }
+}

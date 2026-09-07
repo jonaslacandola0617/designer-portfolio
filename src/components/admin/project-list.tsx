@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SortableList } from "./sortable";
 import { Toast } from "./toast";
+import { ConfirmDialog } from "./confirm-dialog";
 import {
   archiveProject,
   deleteProject,
@@ -31,6 +32,7 @@ export function ProjectList({ projects }: { projects: Row[] }) {
   }
   const [message, setMessage] = useState("");
   const [arranging, setArranging] = useState(false);
+  const [deleting, setDeleting] = useState<Row | null>(null);
   const [pending, start] = useTransition();
   const router = useRouter();
   const run = (fn: () => Promise<ActionResult>) =>
@@ -122,13 +124,7 @@ export function ProjectList({ projects }: { projects: Row[] }) {
                       </button>
                       <button
                         type="button"
-                        onClick={() => {
-                          const confirmation = window.prompt(
-                            `Delete “${p.title}”? Type ${p.slug} to confirm.`,
-                          );
-                          if (confirmation !== null)
-                            run(() => deleteProject(p.id, confirmation));
-                        }}
+                        onClick={() => setDeleting(p)}
                       >
                         Delete
                       </button>
@@ -161,6 +157,34 @@ export function ProjectList({ projects }: { projects: Row[] }) {
           )}
         </div>
       </fieldset>
+      {deleting && (
+        <ConfirmDialog
+          title="Delete project?"
+          description={
+            <>
+              <p>
+                “{deleting.title}” will be permanently removed from the portfolio.
+              </p>
+              <p className="field-note">
+                This action cannot be undone.
+              </p>
+            </>
+          }
+          confirmLabel="Delete project"
+          pending={pending}
+          onClose={() => setDeleting(null)}
+          onConfirm={() =>
+            start(async () => {
+              const result = await deleteProject(deleting.id, deleting.slug);
+              setMessage(result.ok ? "Project deleted." : result.error);
+              if (result.ok) {
+                setDeleting(null);
+                router.refresh();
+              }
+            })
+          }
+        />
+      )}
       <Toast message={message==="Change saved."?message:""}/>
       {message && message!=="Change saved." && (
         <p role="status" className="notice">

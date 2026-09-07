@@ -107,19 +107,33 @@ export async function replaceMedia(id: string, replacementId: string) {
   await retryStorageDeletions();
   await invalidatePortfolio();
 }
-export async function removeMedia(id: string, confirmation: string) {
+export async function removeMedia(id: string) {
+  return removeMediaBulk([id]);
+}
+export async function removeMediaBulk(ids: string[]) {
   await requireAdmin();
-  idSchema.parse(id);
-  // Removing the row first relies on restrictive foreign keys to prevent a concurrent attachment.
+  const uniqueIds = [...new Set(ids.map((id) => idSchema.parse(id)))];
+  if (!uniqueIds.length) return;
+  if (uniqueIds.length > 500) throw new Error("Too many images selected.");
+
+  // Restrictive foreign keys remain the final safety check: if any selected
+  // asset is referenced by a project or Settings, the whole transaction fails.
   await db.$transaction(async (tx) => {
-    const asset = await tx.mediaAsset.findUniqueOrThrow({ where: { id } });
-    if (confirmation !== asset.fileName)
-      throw new Error("Type the file name to confirm.");
-    await tx.mediaAsset.delete({ where: { id } });
-    if (!asset.storageKey.startsWith("samples/"))
-      await tx.storageDeletion.create({
-        data: { storageKey: asset.storageKey },
-      });
+    const assets = await tx.mediaAsset.findMany({
+      where: { id: { in: uniqueIds } },
+      select: { id: true, storageKey: true },
+    });
+    if (assets.length !== uniqueIds.length)
+      throw new Error("One or more selected images no longer exist.");
+
+    await tx.mediaAsset.deleteMany({ where: { id: { in: uniqueIds } } });
+
+    for (const asset of assets) {
+      if (!asset.storageKey.startsWith("samples/"))
+        await tx.storageDeletion.create({
+          data: { storageKey: asset.storageKey },
+        });
+    }
   });
   await retryStorageDeletions();
   await invalidatePortfolio();
