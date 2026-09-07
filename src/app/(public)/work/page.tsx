@@ -1,14 +1,22 @@
 import {
   getPublishedProjects,
   getProjectCategories,
+  getSiteSettings,
 } from "@/features/projects/queries";
 import { Archive } from "@/components/public/archive";
 import { pageMetadata } from "@/lib/seo";
-export const metadata = pageMetadata(
-  "Work",
-  "Browse published graphic-design projects.",
-  "/work",
-);
+
+export async function generateMetadata() {
+  const s = await getSiteSettings();
+  return pageMetadata(
+    "Selected Work — Graphic Design Portfolio",
+    `Selected visual and graphic design projects by ${s.designerName}, ${s.professionalTitle} based in ${s.location}.`,
+    "/work",
+    s.socialImage,
+    `${s.designerName} — selected graphic design work`,
+  );
+}
+
 export default async function Work({
   searchParams,
 }: {
