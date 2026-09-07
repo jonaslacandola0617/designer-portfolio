@@ -8,6 +8,7 @@ import {
 import { Artboard, WorkRow } from "@/components/public/portfolio";
 import { SectionHead } from "@/components/public/identity";
 import { jsonLd, pageMetadata, siteUrl } from "@/lib/seo";
+
 export async function generateMetadata() {
   const s = await getSiteSettings();
   return {
@@ -15,11 +16,13 @@ export async function generateMetadata() {
       s.defaultSeoTitle,
       s.defaultSeoDescription,
       "/",
-      s.socialImage?.url,
+      s.socialImage,
+      `${s.designerName} — ${s.professionalTitle}`,
     ),
     title: { absolute: s.defaultSeoTitle },
   };
 }
+
 export default async function Home() {
   const [s, featured, categories, projects] = await Promise.all([
     getSiteSettings(),
@@ -30,6 +33,13 @@ export default async function Home() {
   const first = featured.filter((p) => p.homeLayout !== "D");
   const more = featured.filter((p) => p.homeLayout === "D");
   const words = s.designerName.split(" ");
+  const sameAs = [
+    s.instagramUrl,
+    s.behanceUrl,
+    s.linkedinUrl,
+    s.githubUrl,
+  ].filter(Boolean);
+
   return (
     <section className="view" id="view-home">
       <script
@@ -37,10 +47,36 @@ export default async function Home() {
         dangerouslySetInnerHTML={{
           __html: jsonLd({
             "@context": "https://schema.org",
-            "@type": "Person",
-            name: s.designerName,
-            jobTitle: s.professionalTitle,
-            url: siteUrl,
+            "@graph": [
+              {
+                "@type": "Person",
+                "@id": `${siteUrl}/#person`,
+                name: s.designerName,
+                jobTitle: s.professionalTitle,
+                description: s.shortBio || s.defaultSeoDescription,
+                url: siteUrl,
+                ...(s.email ? { email: s.email } : {}),
+                ...(s.location
+                  ? {
+                      homeLocation: {
+                        "@type": "Place",
+                        name: s.location,
+                      },
+                    }
+                  : {}),
+                ...(sameAs.length ? { sameAs } : {}),
+                ...(s.capabilities.length ? { knowsAbout: s.capabilities } : {}),
+              },
+              {
+                "@type": "WebSite",
+                "@id": `${siteUrl}/#website`,
+                url: siteUrl,
+                name: s.defaultSeoTitle,
+                description: s.defaultSeoDescription,
+                inLanguage: "en-PH",
+                creator: { "@id": `${siteUrl}/#person` },
+              },
+            ],
           }),
         }}
       />
@@ -60,7 +96,12 @@ export default async function Home() {
         </h1>
         {featured[0]?.coverImage && (
           <div className="opening-figure">
-            <Artboard image={featured[0].coverImage} aspect="SQUARE" priority />
+            <Artboard
+              image={featured[0].coverImage}
+              aspect="SQUARE"
+              priority
+              altFallback={`${featured[0].title} — featured project artwork`}
+            />
           </div>
         )}
         <div className="opening-foot">
@@ -87,31 +128,34 @@ export default async function Home() {
       <div className="container section">
         <SectionHead number="03" title="Working Across" />
         <div className="disciplines">
-          {categories.map((c, i) => (
-            <Link
-              className="disc-row"
-              href={`/work?category=${c.slug}`}
-              key={c.id}
-            >
-              <span className="disc-num mono">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-              <span className="disc-name">{c.name}</span>
-              <span className="disc-count mono">
-                {String(c.count).padStart(2, "0")}
-              </span>
-              {projects.find((p) => p.category.slug === c.slug)?.coverImage && (
-                <div className="disc-thumb">
-                  <Artboard
-                    image={
-                      projects.find((p) => p.category.slug === c.slug)!
-                        .coverImage
-                    }
-                  />
-                </div>
-              )}
-            </Link>
-          ))}
+          {categories.map((c, i) => {
+            const representative = projects.find(
+              (p) => p.category.slug === c.slug,
+            );
+            return (
+              <Link
+                className="disc-row"
+                href={`/work?category=${c.slug}`}
+                key={c.id}
+              >
+                <span className="disc-num mono">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="disc-name">{c.name}</span>
+                <span className="disc-count mono">
+                  {String(c.count).padStart(2, "0")}
+                </span>
+                {representative?.coverImage && (
+                  <div className="disc-thumb">
+                    <Artboard
+                      image={representative.coverImage}
+                      altFallback={`${representative.title} — ${c.name} project artwork`}
+                    />
+                  </div>
+                )}
+              </Link>
+            );
+          })}
         </div>
       </div>
       {s.statement && (
