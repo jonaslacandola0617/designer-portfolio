@@ -72,10 +72,6 @@ export default async function Home() {
               </span>
             ))}
           </p>
-          <p className="opening-status">
-            <strong>{s.availabilityText}</strong>
-            {s.bookingText}
-          </p>
         </div>
       </div>
       <div className="container" style={{ paddingTop: "var(--sp-9)" }}>
