@@ -559,3 +559,175 @@ html:has(.register-admin) {
     justify-self: start;
   }
 }
+
+
+/* Category manager — compact editorial taxonomy controls. */
+.register-admin .category-details {
+  margin-top: var(--sp-7);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--line);
+}
+.register-admin .category-details > summary {
+  margin-bottom: var(--sp-5);
+}
+.register-admin .category-manager {
+  margin-top: var(--sp-4);
+}
+.register-admin .category-manager-head,
+.register-admin .category-add-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--ink);
+}
+.register-admin .category-manager-head h2,
+.register-admin .category-add-head h3 {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.register-admin .category-manager-head h2 {
+  font-size: 1.7rem;
+}
+.register-admin .category-add-head h3 {
+  font-size: 1.3rem;
+}
+.register-admin .category-total {
+  padding-bottom: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.register-admin .category-form {
+  padding: var(--sp-5) 0;
+  border-bottom: 1px solid var(--line);
+}
+.register-admin .category-form.is-new {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.register-admin .category-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+.register-admin .category-form-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.register-admin .category-usage {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.register-admin .category-usage-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--graphite-2);
+}
+.register-admin .category-usage.is-used .category-usage-dot {
+  background: var(--accent);
+}
+.register-admin .category-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr) 110px;
+  gap: var(--sp-5);
+  align-items: end;
+}
+.register-admin .category-fields .field {
+  margin-bottom: 0;
+}
+.register-admin .category-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+.register-admin .category-save,
+.register-admin .category-delete {
+  font-family: var(--font-mono);
+  font-size: 0.69rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--line);
+  transition:
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    opacity var(--dur) var(--ease);
+}
+.register-admin .category-save {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.register-admin .category-save:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.register-admin .category-delete {
+  color: var(--graphite);
+}
+.register-admin .category-delete:not(:disabled):hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.register-admin .category-save:disabled,
+.register-admin .category-delete:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+.register-admin .category-message {
+  margin-top: var(--sp-3);
+  padding-left: var(--sp-3);
+  border-left: 2px solid var(--accent);
+  font-size: 0.78rem;
+  color: var(--graphite);
+}
+.register-admin .category-message.is-error {
+  color: var(--ink);
+}
+.register-admin .category-add {
+  margin-top: var(--sp-8);
+}
+@media (max-width: 760px) {
+  .register-admin .category-fields {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .register-admin .category-fields .field:last-child {
+    grid-column: 1 / -1;
+    max-width: 140px;
+  }
+}
+@media (max-width: 560px) {
+  .register-admin .category-manager-head,
+  .register-admin .category-form-head {
+    align-items: flex-start;
+  }
+  .register-admin .category-fields {
+    grid-template-columns: 1fr;
+    gap: var(--sp-4);
+  }
+  .register-admin .category-fields .field:last-child {
+    grid-column: auto;
+    max-width: none;
+  }
+  .register-admin .category-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
