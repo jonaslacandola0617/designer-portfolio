@@ -132,9 +132,48 @@ test("public routes, SEO and small-screen layout", async ({ page }) => {
       ),
     ).toBe(true);
   }
+  await page.goto("/");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    /design\.jonasl\.online\/?$/,
+  );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    /^https?:\/\//,
+  );
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+    "content",
+    "summary_large_image",
+  );
+  await expect(page.locator('link[rel="icon"]').first()).toHaveAttribute(
+    "href",
+    /icon\.svg/,
+  );
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute(
+    "href",
+    /manifest\.webmanifest/,
+  );
+
   const sitemap = await page.request.get("/sitemap.xml");
   expect(sitemap.ok()).toBe(true);
   expect(await sitemap.text()).not.toContain("/admin/");
+
+  const robots = await page.request.get("/robots.txt");
+  expect(robots.ok()).toBe(true);
+  expect(await robots.text()).toContain("Sitemap:");
+
+  const icon = await page.request.get("/icon.svg");
+  expect(icon.ok()).toBe(true);
+  expect(icon.headers()["content-type"]).toContain("image/svg+xml");
+
+  const socialImage = await page.request.get("/opengraph-image");
+  expect(socialImage.ok()).toBe(true);
+  expect(socialImage.headers()["content-type"]).toContain("image/png");
+
+  const manifest = await page.request.get("/manifest.webmanifest");
+  expect(manifest.ok()).toBe(true);
+  expect(manifest.headers()["content-type"]).toContain("application/manifest+json");
+
   await page.goto("/admin/login");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
     "content",
