@@ -1,8 +1,32 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { siteUrl } from "@/lib/seo";
 import "./globals.css";
 import { fraunces, grotesk, mono } from "@/lib/fonts";
-export const metadata: Metadata = { metadataBase: new URL(siteUrl) };
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  applicationName: "Jonas Lacandola — Design Portfolio",
+  authors: [{ name: "Jonas Lacandola", url: siteUrl }],
+  creator: "Jonas Lacandola",
+  publisher: "Jonas Lacandola",
+  referrer: "strict-origin-when-cross-origin",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/apple-icon", sizes: "180x180", type: "image/png" }],
+  },
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#F2F0EA",
+  colorScheme: "light",
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -10,7 +34,7 @@ export default function RootLayout({
 }) {
   return (
     <html
-      lang="en"
+      lang="en-PH"
       className={`${fraunces.variable} ${grotesk.variable} ${mono.variable}`}
     >
       <body>
