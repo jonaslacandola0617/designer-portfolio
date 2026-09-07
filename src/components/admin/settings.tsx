@@ -5,6 +5,7 @@ import type { Category, SiteSettings, MediaAsset } from "@prisma/client";
 import { Field } from "./field";
 import { Toast } from "./toast";
 import { SortableList } from "./sortable";
+import { ConfirmDialog } from "./confirm-dialog";
 import {
   saveSettings,
   saveCategory,
@@ -267,6 +268,7 @@ function CategoryForm({
   onFeedback: (feedback: CategoryFeedback) => void;
 }) {
   const [pending, start] = useTransition();
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const router = useRouter();
   const projectCount = category?._count.projects ?? 0;
   const isInUse = projectCount > 0;
@@ -365,33 +367,50 @@ function CategoryForm({
                 ? "Move or remove projects from this category before deleting it."
                 : "Delete this unused category."
             }
-            onClick={() => {
-              if (
-                window.confirm(
-                  `Delete the unused category “${category.name}”?`,
-                )
-              ) {
-                start(async () => {
-                  const result = await deleteCategory(category.id);
-
-                  if (!result.ok) {
-                    onFeedback({ kind: "error", message: result.error });
-                    return;
-                  }
-
-                  onFeedback({
-                    kind: "success",
-                    message: "Category deleted.",
-                  });
-                  router.refresh();
-                });
-              }
-            }}
+            onClick={() => setConfirmDelete(true)}
           >
             Delete
           </button>
         )}
       </div>
+
+      {category && confirmDelete && (
+        <ConfirmDialog
+          title="Delete category?"
+          description={
+            <>
+              <p>
+                “{category.name}” will be permanently removed from the category
+                list.
+              </p>
+              <p className="field-note">
+                Only unused categories can be deleted. This action cannot be
+                undone.
+              </p>
+            </>
+          }
+          confirmLabel="Delete category"
+          pending={pending}
+          onClose={() => setConfirmDelete(false)}
+          onConfirm={() =>
+            start(async () => {
+              const result = await deleteCategory(category.id);
+
+              if (!result.ok) {
+                onFeedback({ kind: "error", message: result.error });
+                return;
+              }
+
+              setConfirmDelete(false);
+              onFeedback({
+                kind: "success",
+                message: "Category deleted.",
+              });
+              router.refresh();
+            })
+          }
+        />
+      )}
     </form>
   );
 }
