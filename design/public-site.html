@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jonas Lacandola — Visual Design</title>
+<meta name="description" content="Jonas Lacandola — independent visual designer working across posters, campaigns, social content and merch graphics.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' fill='none' stroke='%23111111' stroke-width='3'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-weight='700' font-size='28' fill='%23111111' text-anchor='middle'%3EJL%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Space+Grotesk:wght@300..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   REGISTER — Design System for Jonas Lacandola / Visual Design
+   Tokens, primitives, components, views.
+   ============================================================ */
+
+:root{
+  /* --- color tokens --- */
+  --paper:      #F2F0EA;
+  --paper-2:    #E9E5D9;   /* recessed surface */
+  --paper-3:    #FBFAF7;   /* raised surface */
+  --ink:        #111111;
+  --ink-soft:   #23221F;
+  --graphite:   #6E6B65;
+  --graphite-2: #96938B;
+  --line:       #D8D4CB;
+  --line-soft:  #E4E1D8;
+
+  --accent:      #2438D6;  /* "proof cobalt" — the annotation ink */
+  --accent-deep: #16247E;
+  --accent-tint: #E4E7FB;
+
+  --paper-rgb: 242,240,234;
+  --ink-rgb:   17,17,17;
+  --accent-rgb: 36,56,214;
+
+  /* --- type families --- */
+  --font-display: "Fraunces", Georgia, serif;
+  --font-grotesk: "Space Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:    "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+  /* --- fluid type scale --- */
+  --fs-xl:      clamp(3.4rem, 2.3rem + 6.6vw, 8rem);
+  --fs-display: clamp(2.5rem, 1.9rem + 3.4vw, 4.75rem);
+  --fs-section: clamp(1.7rem, 1.45rem + 1.4vw, 2.6rem);
+  --fs-lead:    clamp(1.15rem, 1.05rem + 0.5vw, 1.5rem);
+  --fs-body:    1.0625rem;
+  --fs-small:   0.9rem;
+  --fs-meta:    0.76rem;
+  --fs-micro:   0.66rem;
+
+  /* --- spacing scale --- */
+  --sp-1: 4px;  --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+  --sp-5: 24px; --sp-6: 32px;  --sp-7: 48px;  --sp-8: 64px;
+  --sp-9: 96px; --sp-10: 128px; --sp-11: 176px;
+
+  --radius-sm: 2px;
+  --radius-md: 4px;
+
+  --ease-editorial: cubic-bezier(.22,1,.36,1);
+  --dur-ui: 200ms;
+  --dur-editorial: 650ms;
+
+  --container: 1400px;
+  --gutter: clamp(20px, 4.4vw, 72px);
+  --col-gap: clamp(14px, 2vw, 28px);
+}
+
+@media (prefers-reduced-motion: reduce){
+  :root{ --dur-ui: 1ms; --dur-editorial: 1ms; }
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ background:var(--paper); scroll-behavior:auto; }
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-grotesk);
+  font-size:var(--fs-body);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+img,svg{ display:block; max-width:100%; }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; padding:0; }
+ul{ margin:0; padding:0; list-style:none; }
+h1,h2,h3,h4,p{ margin:0; }
+::selection{ background:var(--accent); color:var(--paper); }
+
+.container{ max-width:var(--container); margin:0 auto; padding-left:var(--gutter); padding-right:var(--gutter); }
+
+.eyebrow{
+  font-family:var(--font-mono); font-size:var(--fs-meta); letter-spacing:.08em;
+  text-transform:uppercase; color:var(--graphite);
+}
+.mono{ font-family:var(--font-mono); }
+
+.skip-link{
+  position:absolute; left:-9999px; top:0; background:var(--ink); color:var(--paper);
+  padding:12px 18px; z-index:999; font-family:var(--font-mono); font-size:var(--fs-meta);
+}
+.skip-link:focus{ left:var(--gutter); top:var(--sp-4); }
+
+:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+/* ============================================================
+   Signature marks — registration mark + JL monogram
+   ============================================================ */
+.reg-mark{ width:1em; height:1em; flex:none; }
+.reg-mark circle,.reg-mark line{ stroke:currentColor; fill:none; stroke-width:1.4; }
+
+.jl-mark{ display:inline-flex; align-items:center; justify-content:center; }
+.jl-mark svg{ display:block; }
+
+/* ============================================================
+   Transition veil (page-route wipe)
+   ============================================================ */
+.transition-veil{
+  position:fixed; inset:0; background:var(--ink); color:var(--paper);
+  transform:translateY(101%); z-index:900; pointer-events:none;
+  display:flex; align-items:center; justify-content:center;
+  transition:transform var(--dur-editorial) var(--ease-editorial);
+}
+.transition-veil.is-covering{ transform:translateY(0%); }
+.transition-veil.is-leaving{ transform:translateY(-101%); }
+.transition-veil .veil-mark{ width:56px; height:56px; opacity:.9; }
+
+/* ============================================================
+   Header
+   ============================================================ */
+.site-header{
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  background:rgba(var(--paper-rgb),.86); backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+}
+.header-inner{
+  max-width:var(--container); margin:0 auto; padding:var(--sp-4) var(--gutter);
+  display:flex; align-items:center; gap:var(--sp-6);
+}
+.brand{ display:flex; align-items:center; gap:var(--sp-3); flex:none; }
+.brand-mark{ width:34px; height:34px; border:1.4px solid var(--ink); display:flex; align-items:center; justify-content:center; }
+.brand-mark span{ font-family:var(--font-display); font-weight:700; font-size:.95rem; letter-spacing:-.02em; }
+.brand-text{ font-family:var(--font-mono); font-size:.68rem; line-height:1.35; letter-spacing:.06em; text-transform:uppercase; }
+.brand-text em{ display:block; font-style:normal; color:var(--graphite); }
+
+.primary-nav{ display:flex; gap:var(--sp-6); margin-right:auto; }
+.primary-nav a{
+  position:relative; font-family:var(--font-mono); font-size:.72rem; letter-spacing:.1em;
+  text-transform:uppercase; padding:var(--sp-1) 0; color:var(--graphite);
+  transition:color var(--dur-ui) var(--ease-editorial);
+}
+.primary-nav a::after{
+  content:""; position:absolute; left:0; right:100%; bottom:-3px; height:1.4px; background:var(--ink);
+  transition:right var(--dur-ui) var(--ease-editorial);
+}
+.primary-nav a:hover,.primary-nav a.is-active{ color:var(--ink); }
+.primary-nav a:hover::after,.primary-nav a.is-active::after{ right:0; }
+
+.header-status{
+  display:flex; align-items:center; gap:var(--sp-2); font-family:var(--font-mono);
+  font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--graphite);
+  flex:none;
+}
+.status-dot{ width:6px; height:6px; border-radius:50%; background:var(--accent); flex:none; }
+
+.menu-toggle{
+  display:none; font-family:var(--font-mono); font-size:.72rem; letter-spacing:.1em;
+  text-transform:uppercase; border:1px solid var(--ink); padding:8px 14px; flex:none;
+}
+
+@media (max-width:760px){
+  .primary-nav,.header-status{ display:none; }
+  .menu-toggle{ display:inline-block; margin-left:auto; }
+  .header-inner{ gap:var(--sp-4); }
+}
+
+/* Mobile full-screen nav */
+.mobile-menu{
+  position:fixed; inset:0; background:var(--paper); z-index:300;
+  display:flex; flex-direction:column; justify-content:space-between;
+  padding:var(--sp-4) var(--gutter) var(--sp-7);
+}
+.mobile-menu[hidden]{ display:none; }
+.mobile-menu-top{ display:flex; justify-content:space-between; align-items:center; padding-top:var(--sp-3); }
+.mobile-menu-list{ display:flex; flex-direction:column; gap:var(--sp-2); margin-top:var(--sp-8); }
+.mobile-menu-list a{
+  font-family:var(--font-display); font-weight:600; font-size:clamp(2.4rem,14vw,3.6rem);
+  letter-spacing:-.02em; border-bottom:1px solid var(--line); padding:var(--sp-3) 0;
+}
+.mobile-menu-foot{ font-family:var(--font-mono); font-size:.72rem; color:var(--graphite); letter-spacing:.05em; }
+.mobile-menu-foot p{ margin-bottom:var(--sp-1); }
+
+/* ============================================================
+   View cursor ("VIEW" label follows pointer over artboards)
+   ============================================================ */
+.view-cursor{
+  position:fixed; left:0; top:0; z-index:400; pointer-events:none;
+  transform:translate(-9999px,-9999px);
+  font-family:var(--font-mono); font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
+  background:var(--ink); color:var(--paper); padding:6px 12px; border-radius:100px;
+  opacity:0; transition:opacity var(--dur-ui) ease;
+  mix-blend-mode:normal;
+}
+.view-cursor.is-visible{ opacity:1; }
+@media (pointer:coarse){ .view-cursor{ display:none; } }
+
+/* ============================================================
+   Layout primitives
+   ============================================================ */
+main{ display:block; }
+.view[hidden]{ display:none; }
+.grid-12{ display:grid; grid-template-columns:repeat(12,1fr); gap:var(--col-gap); }
+
+.section{ padding:var(--sp-10) 0; border-top:1px solid var(--line); }
+.section-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:var(--sp-5); margin-bottom:var(--sp-7); flex-wrap:wrap; }
+.section-number{ display:flex; align-items:center; gap:var(--sp-2); color:var(--graphite); }
+.section-number .reg-mark{ color:var(--accent); }
+.section-title{ font-family:var(--font-display); font-weight:600; font-size:var(--fs-section); letter-spacing:-.01em; }
+
+/* Artboards ---------------------------------------------------
+   Nine bespoke CSS-generated "work" compositions. These stand in
+   for real artwork in the prototype; each has its own palette and
+   motif, distinct from the site's own neutral chrome.
+----------------------------------------------------------------*/
+.artboard{
+  position:relative; overflow:hidden; background:var(--ink); aspect-ratio:4/5;
+  isolation:isolate;
+}
+.artboard.is-wide{ aspect-ratio:16/10; }
+.artboard.is-square{ aspect-ratio:1/1; }
+.artboard .art-mark{
+  position:absolute; font-family:var(--font-display); font-weight:700; line-height:.8;
+  color:inherit; user-select:none;
+}
+.artboard .art-tag{
+  position:absolute; left:14px; bottom:12px; font-family:var(--font-mono); font-size:.62rem;
+  letter-spacing:.1em; text-transform:uppercase; opacity:.85;
+}
+
+.art-1{ background:linear-gradient(160deg,#171018 0%,#2A1030 55%,#3A0F1C 100%); color:#F2EFEA; }
+.art-1 .art-mark{ font-size:min(46vw,220px); top:-.12em; left:-.06em; opacity:.9; }
+.art-1::after{ content:""; position:absolute; inset:0; background:repeating-linear-gradient(180deg,rgba(242,240,234,.05) 0 1px,transparent 1px 7px); }
+.art-1::before{ content:""; position:absolute; left:0; right:0; bottom:22%; height:1px; background:var(--accent); box-shadow:0 0 0 1px var(--accent); }
+
+.art-2{ background:linear-gradient(125deg,#FF6A3D 0 52%, #F4D53B 52% 100%); color:#171018; }
+.art-2 .art-mark{ font-size:min(30vw,150px); bottom:-6%; right:-2%; color:rgba(17,17,17,.14); }
+.art-2::before{ content:""; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(17,17,17,.35) 1.4px, transparent 1.6px); background-size:9px 9px; opacity:.25; mix-blend-mode:multiply; }
+
+.art-3{ background:radial-gradient(120% 120% at 30% 20%,#FFE7A8 0%,#F7B84B 55%,#E9862F 100%); color:#3A1B08; }
+.art-3::before{ content:""; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(58,27,8,.5) 1.6px, transparent 1.7px); background-size:14px 14px; opacity:.35; }
+.art-3 .art-mark{ font-size:min(24vw,120px); top:8%; left:8%; }
+
+.art-4{ background:#C15B3A; color:#F4ECE2; }
+.art-4::before{ content:""; position:absolute; left:50%; top:0; bottom:0; width:1px; background:rgba(244,236,226,.4); transform:translateX(-50%); }
+.art-4 .art-mark{ font-size:min(20vw,96px); bottom:10%; left:8%; right:8%; letter-spacing:-.02em; }
+.art-4::after{ content:""; position:absolute; right:10%; top:10%; width:34%; aspect-ratio:1; border:1.4px solid rgba(244,236,226,.7); border-radius:50%; }
+
+.art-5{ background:var(--paper-3); color:var(--ink); }
+.art-5::before{ content:""; position:absolute; inset:14% ; background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px); background-size:12.5% 20%; }
+.art-5 .art-mark{ font-size:min(14vw,64px); top:14%; left:14%; }
+.art-5::after{ content:""; position:absolute; right:14%; bottom:14%; width:10%; aspect-ratio:1; background:var(--accent); }
+
+.art-6{ background:conic-gradient(from 200deg at 32% 38%,#173E8C,#2E8C7A,#F4D53B,#C1483A,#173E8C); color:#F2EFEA; filter:saturate(1.05); }
+.art-6::before{ content:""; position:absolute; inset:-10%; background:radial-gradient(circle at 68% 70%, rgba(17,17,17,.55), transparent 55%); }
+.art-6 .art-mark{ font-size:min(20vw,100px); bottom:8%; right:8%; mix-blend-mode:overlay; }
+
+.art-7{ background:repeating-linear-gradient(115deg,#151515 0 26px,#C1332A 26px 52px); color:#F2EFEA; }
+.art-7 .art-mark{ font-size:min(30vw,150px); top:50%; left:50%; transform:translate(-50%,-50%); color:#F2EFEA; text-shadow:0 0 0 #000; }
+
+.art-8{ background:#123B3D; color:#DCEFEA; }
+.art-8::before{ content:""; position:absolute; inset:0; background-image:radial-gradient(circle,rgba(220,239,234,.5) 1.4px, transparent 1.6px); background-size:16px 16px; transform:rotate(6deg) scale(1.3); opacity:.5; }
+.art-8 .art-mark{ font-size:min(16vw,84px); bottom:10%; left:8%; }
+
+.art-9{ background:var(--paper-3); color:var(--ink); }
+.art-9 .grid-lines{ position:absolute; inset:12%; display:grid; grid-template-columns:repeat(6,1fr); grid-template-rows:repeat(6,1fr); }
+.art-9 .grid-lines div{ border:1px solid var(--line-soft); }
+.art-9 .grid-lines div:nth-child(17){ background:var(--accent); border-color:var(--accent); }
+.art-9 .art-mark{ font-size:min(14vw,60px); bottom:6%; right:8%; }
+
+.hover-view{ cursor:none; }
+.artboard-frame{ position:relative; overflow:hidden; }
+.artboard-frame .artboard{ transition:transform var(--dur-editorial) var(--ease-editorial); }
+.artboard-frame:hover .artboard{ transform:scale(1.035); }
+.artboard-frame .frame-meta{
+  display:flex; justify-content:space-between; align-items:baseline; margin-top:var(--sp-3);
+  font-family:var(--font-mono); font-size:var(--fs-meta); color:var(--graphite); letter-spacing:.04em;
+}
+.artboard-frame .frame-title{ font-family:var(--font-display); font-weight:600; }
+
+/* Buttons / links */
+.btn{
+  display:inline-flex; align-items:center; gap:10px; font-family:var(--font-mono); font-size:.78rem;
+  letter-spacing:.08em; text-transform:uppercase; padding:14px 22px; border:1px solid var(--ink);
+  transition:background var(--dur-ui) var(--ease-editorial), color var(--dur-ui) var(--ease-editorial);
+}
+.btn:hover{ background:var(--ink); color:var(--paper); }
+.btn-arrow{ transition:transform var(--dur-ui) var(--ease-editorial); }
+.btn:hover .btn-arrow{ transform:translateX(4px); }
+
+.link-underline{
+  position:relative; display:inline-block; font-family:var(--font-mono); font-size:.78rem;
+  letter-spacing:.08em; text-transform:uppercase;
+}
+.link-underline::after{ content:""; position:absolute; left:0; right:0; bottom:-2px; height:1px; background:currentColor; transform:scaleX(1); transform-origin:left; }
+.link-underline:hover::after{ animation:none; }
+
+/* ============================================================
+   HOME
+   ============================================================ */
+#view-home{ padding-top:0; }
+
+.opening{
+  min-height:100svh; display:flex; flex-direction:column; justify-content:center;
+  padding:calc(var(--sp-10) + 64px) 0 var(--sp-9);
+  position:relative;
+}
+.opening-meta{
+  display:flex; justify-content:space-between; font-family:var(--font-mono); font-size:var(--fs-meta);
+  letter-spacing:.06em; text-transform:uppercase; color:var(--graphite); margin-bottom:var(--sp-6);
+}
+.opening-headline{
+  font-family:var(--font-display); font-weight:600; font-size:var(--fs-xl); line-height:.86;
+  letter-spacing:-.02em; position:relative; z-index:2;
+}
+.opening-headline .line{ display:block; overflow:hidden; }
+.opening-headline .line span{ display:block; transform:translateY(105%); animation:riseIn var(--dur-editorial) var(--ease-editorial) forwards; }
+.opening-headline .line:nth-child(2) span{ animation-delay:80ms; }
+@keyframes riseIn{ to{ transform:translateY(0); } }
+
+.opening-figure{
+  position:absolute; right:var(--gutter); top:58%; width:min(30vw,300px); z-index:1;
+  opacity:0; animation:figureIn var(--dur-editorial) var(--ease-editorial) 260ms forwards;
+}
+@keyframes figureIn{ from{ opacity:0; transform:translateY(18px);} to{ opacity:1; transform:translateY(0);} }
+
+.opening-foot{
+  display:grid; grid-template-columns:1.4fr 1fr; gap:var(--sp-6); align-items:end; margin-top:var(--sp-8);
+}
+.opening-disciplines{
+  font-family:var(--font-grotesk); font-weight:500; font-size:var(--fs-lead); letter-spacing:-.005em;
+}
+.opening-disciplines span{ color:var(--graphite); }
+.opening-status{ text-align:right; font-family:var(--font-mono); font-size:var(--fs-meta); color:var(--graphite); letter-spacing:.05em; }
+.opening-status strong{ display:block; color:var(--ink); font-weight:500; }
+
+@media (max-width:760px){
+  .opening{ padding-top:120px; }
+  .opening-figure{ display:none; }
+  .opening-foot{ grid-template-columns:1fr; gap:var(--sp-4); }
+  .opening-status{ text-align:left; }
+}
+
+/* Selected work rows — every project individually art-directed */
+.work-row{ padding:var(--sp-9) 0; border-top:1px solid var(--line); }
+.work-row .grid-12{ align-items:center; }
+.work-row .wr-num{ font-family:var(--font-mono); font-size:var(--fs-meta); color:var(--graphite); grid-column:span 1; align-self:start; }
+.work-row .wr-copy{ display:flex; flex-direction:column; gap:var(--sp-3); }
+.work-row .wr-title{ font-family:var(--font-display); font-weight:600; font-size:var(--fs-display); line-height:.94; letter-spacing:-.01em; }
+.work-row .wr-meta{ font-family:var(--font-mono); font-size:var(--fs-meta); color:var(--graphite); letter-spacing:.05em; text-transform:uppercase; }
+.work-row .wr-desc{ max-width:46ch; color:var(--ink-soft); }
+
+.wr-a .wr-art{ grid-column:6 / span 7; }
+.wr-a .wr-text{ grid-column:2 / span 4; }
+.wr-b .wr-art{ grid-column:1 / span 6; }
+.wr-b .wr-text{ grid-column:8 / span 5; }
+.wr-c .wr-art{ grid-column:2 / span 10; }
+.wr-c .wr-text{ grid-column:2 / span 6; margin-top:var(--sp-5); }
+.wr-d .wr-art-pair{ grid-column:1 / span 7; display:grid; grid-template-columns:1fr 1fr; gap:var(--col-gap); }
+.wr-d .wr-text{ grid-column:9 / span 4; }
+
+@media (max-width:900px){
+  .work-row .grid-12 > *{ grid-column:1 / -1 !important; }
+  .work-row .wr-text{ margin-top:var(--sp-5) !important; }
+  .wr-d .wr-art-pair{ grid-template-columns:1fr 1fr; }
+}
+
+/* Disciplines index */
+.disciplines{ }
+.disc-row{
+  display:grid; grid-template-columns:60px 1fr 220px; align-items:center; gap:var(--sp-5);
+  padding:var(--sp-5) 0; border-top:1px solid var(--line); position:relative;
+}
+.disc-row:last-child{ border-bottom:1px solid var(--line); }
+.disc-row .disc-num{ font-family:var(--font-mono); font-size:var(--fs-meta); color:var(--graphite); }
+.disc-row .disc-name{
+  font-family:var(--font-display); font-weight:600; font-size:clamp(1.8rem,2.2rem + 2vw,4.2rem);
+  letter-spacing:-.01em; transition:color var(--dur-ui) var(--ease-editorial);
+}
+.disc-row .disc-count{ font-family:var(--font-mono); font-size:var(--fs-meta); color:var(--graphite); text-align:right; }
+.disc-thumb{
+  position:absolute; right:230px; top:50%; width:150px; aspect-ratio:4/5; transform:translateY(-50%) scale(.92);
+  opacity:0; pointer-events:none; transition:opacity var(--dur-ui) var(--ease-editorial), transform var(--dur-ui) var(--ease-editorial);
+  z-index:2;
+}
+.disc-row:hover .disc-thumb{ opacity:1; transform:translateY(-50%) scale(1); }
+.disc-row:hover .disc-name{ color:var(--accent); }
+@media (max-width:860px){
+  .disc-row{ grid-template-columns:40px 1fr auto; }
+  .disc-thumb{ display:none; }
+}
+
+/* Philosophy statement */
+.statement{ text-align:left; padding:var(--sp-10) 0; }
+.statement blockquote{
+  font-family:var(--font-display); font-style:italic; font-weight:500;
+  font-size:clamp(1.8rem,1.3rem + 3vw,3.6rem); line-height:1.15; max-width:18ch; letter-spacing:-.01em;
+}
+.statement cite{ display:block; margin-top:var(--sp-5); font-family:var(--font-mono); font-style:normal; font-size:var(--fs-meta); color:var(--graphite); letter-spacing:.05em; }
+
+/* Home teaser blocks (about/contact) */
+.teaser{ padding:var(--sp-10) 0; border-top:1px solid var(--line); }
+.teaser-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-8); align-items:end; }
+.teaser h3{ font-family:var(--font-display); font-weight:600; font-size:var(--fs-display); letter-spacing:-.01em; line-height:1; margin-bottom:var(--sp-5); }
+.teaser p{ max-width:44ch; color:var(--ink-soft); margin-bottom:var(--sp-6); }
+@media (max-width:860px){ .teaser-grid{ grid-template-columns:1fr; } }
+
+/* ============================================================
+   WORK ARCHIVE
+   ============================================================ */
+.page-head{ padding:calc(var(--sp-10) + 40px) 0 var(--sp-7); }
+.page-head .page-eyebrow{ margin-bottom:var(--sp-4); }
+.page-head h1{ font-family:var(--font-display); font-weight:600; font-size:var(--fs-display); letter-spacing:-.01em; }
+
+.archive-controls{
+  display:flex; justify-content:space-between; align-items:center; gap:var(--sp-5); flex-wrap:wrap;
+  padding-bottom:var(--sp-6); border-bottom:1px solid var(--line); margin-bottom:var(--sp-8);
+}
+.filter-list{ display:flex; flex-wrap:wrap; gap:var(--sp-6); }
+.filter-list button{
+  font-family:var(--font-display); font-weight:600; font-size:clamp(1.1rem,1rem + 1vw,1.7rem);
+  color:var(--graphite-2); display:flex; align-items:baseline; gap:6px; letter-spacing:-.01em;
+  transition:color var(--dur-ui) var(--ease-editorial);
+}
+.filter-list button sup{ font-family:var(--font-mono); font-size:.6rem; font-weight:400; top:-.6em; color:var(--graphite); }
+.filter-list button.is-active,.filter-list button:hover{ color:var(--ink); }
+.filter-list button.is-active{ text-decoration:underline; text-underline-offset:6px; text-decoration-color:var(--accent); text-decoration-thickness:2px; }
+
+.view-toggle{ display:flex; border:1px solid var(--ink); }
+.view-toggle button{
+  font-family:var(--font-mono); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+  padding:9px 16px; transition:background var(--dur-ui) var(--ease-editorial), color var(--dur-ui) var(--ease-editorial);
+}
+.view-toggle button.is-active{ background:var(--ink); color:var(--paper); }
+
+.archive-visual{ display:grid; grid-template-columns:repeat(12,1fr); gap:var(--sp-7) var(--col-gap); }
+@media (max-width:700px){ .archive-visual > *{ grid-column:1 / -1 !important; } }
+.archive-item{ }
+.archive-item .frame-title{ font-size:clamp(1.2rem,1.6vw + .6rem,1.7rem); }
+
+.archive-index{ }
+.index-row{
+  display:grid; grid-template-columns:70px 1fr 140px 90px 90px; gap:var(--sp-4); align-items:baseline;
+  padding:var(--sp-4) 0; border-top:1px solid var(--line); font-family:var(--font-mono); font-size:.82rem;
+}
+.index-row:last-child{ border-bottom:1px solid var(--line); }
+.index-row .idx-title{ font-family:var(--font-display); font-size:1.35rem; font-weight:600; letter-spacing:-.01em; }
+.index-row .idx-cat,.index-row .idx-year{ color:var(--graphite); text-transform:uppercase; letter-spacing:.04em; }
+.index-row .idx-view{ text-align:right; opacity:0; transition:opacity var(--dur-ui) ease; letter-spacing:.06em; text-transform:uppercase; }
+.index-row:hover .idx-view{ opacity:1; }
+.index-row:hover{ background:var(--paper-2); }
+.index-head{
+  display:grid; grid-template-columns:70px 1fr 140px 90px 90px; gap:var(--sp-4);
+  font-family:var(--font-mono); font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--graphite);
+  padding-bottom:var(--sp-3); border-bottom:1px solid var(--ink);
+}
+@media (max-width:700px){
+  .index-row,.index-head{ grid-template-columns:34px 1fr 70px; }
+  .index-row .idx-year,.index-row .idx-view,.index-head .ih-year,.index-head .ih-view{ display:none; }
+}
+
+/* ============================================================
+   PROJECT DETAIL
+   ============================================================ */
+.project-head{ padding:calc(var(--sp-10) + 40px) 0 var(--sp-8); }
+.project-head .back-link{ display:inline-flex; align-items:center; gap:8px; margin-bottom:var(--sp-7); color:var(--graphite); }
+.project-head .back-link:hover{ color:var(--ink); }
+.project-eyebrow{ margin-bottom:var(--sp-4); }
+.project-title{ font-family:var(--font-display); font-weight:600; font-size:var(--fs-xl); line-height:.9; letter-spacing:-.02em; margin-bottom:var(--sp-7); }
+.project-meta-row{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:var(--sp-5); border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line); padding:var(--sp-5) 0;
+}
+.project-meta-row .pm-label{ font-family:var(--font-mono); font-size:var(--fs-micro); letter-spacing:.08em; text-transform:uppercase; color:var(--graphite); margin-bottom:6px; }
+.project-meta-row .pm-value{ font-family:var(--font-grotesk); font-weight:500; }
+@media (max-width:760px){ .project-meta-row{ grid-template-columns:1fr 1fr; row-gap:var(--sp-5);} }
+
+.project-hero{ margin:var(--sp-9) 0; }
+.project-hero .artboard{ aspect-ratio:16/9; }
+
+.project-narrative{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--sp-7); padding:var(--sp-9) 0; border-top:1px solid var(--line); }
+.project-narrative .pn-label{ font-family:var(--font-mono); font-size:var(--fs-meta); letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:var(--sp-3); }
+.project-narrative p{ max-width:38ch; color:var(--ink-soft); }
+@media (max-width:860px){ .project-narrative{ grid-template-columns:1fr; gap:var(--sp-6);} }
+
+.project-gallery{ display:grid; grid-template-columns:repeat(12,1fr); gap:var(--sp-6) var(--col-gap); padding-bottom:var(--sp-10); }
+.project-gallery .pg-a{ grid-column:1 / span 7; }
+.project-gallery .pg-b{ grid-column:8 / span 5; margin-top:var(--sp-9); }
+.project-gallery .pg-c{ grid-column:2 / span 10; }
+@media (max-width:860px){ .project-gallery > *{ grid-column:1/-1 !important; margin-top:0 !important; } }
+
+.next-project{ border-top:1px solid var(--line); padding:var(--sp-9) 0 var(--sp-10); }
+.next-project .np-label{ margin-bottom:var(--sp-5); }
+.next-project-link{ display:grid; grid-template-columns:1fr 240px; gap:var(--sp-7); align-items:center; }
+.next-project-link .np-title{ font-family:var(--font-display); font-weight:600; font-size:var(--fs-display); letter-spacing:-.01em; transition:transform var(--dur-editorial) var(--ease-editorial); }
+.next-project-link:hover .np-title{ transform:translateX(10px); }
+.next-project-link .artboard{ aspect-ratio:4/3; }
+@media (max-width:760px){ .next-project-link{ grid-template-columns:1fr; } .next-project-link .artboard{ order:-1; } }
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+.about-open{ padding:calc(var(--sp-10) + 40px) 0 var(--sp-8); }
+.about-open h1{ font-family:var(--font-display); font-weight:600; font-size:var(--fs-xl); line-height:.9; letter-spacing:-.02em; max-width:11ch; }
+.about-bio{ display:grid; grid-template-columns:1fr 2fr; gap:var(--sp-8); padding:var(--sp-9) 0; border-top:1px solid var(--line); }
+.about-bio p{ font-size:var(--fs-lead); line-height:1.5; max-width:58ch; color:var(--ink-soft); }
+@media (max-width:860px){ .about-bio{ grid-template-columns:1fr; } }
+
+.capabilities{ padding:var(--sp-9) 0; border-top:1px solid var(--line); }
+.cap-list{ display:grid; grid-template-columns:repeat(2,1fr); }
+.cap-row{ display:flex; align-items:baseline; gap:var(--sp-4); padding:var(--sp-4) var(--sp-5) var(--sp-4) 0; border-bottom:1px solid var(--line); }
+.cap-row .cap-num{ font-family:var(--font-mono); font-size:var(--fs-meta); color:var(--graphite); }
+.cap-row .cap-name{ font-family:var(--font-grotesk); font-weight:500; font-size:1.05rem; }
+@media (max-width:700px){ .cap-list{ grid-template-columns:1fr; } }
+
+.tools-row{ padding:var(--sp-9) 0; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr 2fr; gap:var(--sp-8); }
+.tools-row .eyebrow{ margin-bottom:var(--sp-4); }
+.tools-list{ display:flex; flex-wrap:wrap; gap:var(--sp-3) var(--sp-6); }
+.tools-list span{ font-family:var(--font-mono); font-size:.85rem; color:var(--ink-soft); }
+@media (max-width:860px){ .tools-row{ grid-template-columns:1fr; } }
+
+/* ============================================================
+   CONTACT
+   ============================================================ */
+.contact-open{ padding:calc(var(--sp-10) + 40px) 0 var(--sp-7); }
+.contact-open h1{ font-family:var(--font-display); font-weight:600; font-size:var(--fs-xl); line-height:.9; letter-spacing:-.02em; max-width:13ch; }
+.contact-email{
+  display:inline-block; margin-top:var(--sp-7); font-family:var(--font-display); font-weight:500;
+  font-style:italic; font-size:clamp(1.4rem,1rem + 2.2vw,2.6rem); border-bottom:2px solid var(--ink);
+  transition:color var(--dur-ui) var(--ease-editorial), border-color var(--dur-ui) var(--ease-editorial);
+}
+.contact-email:hover{ color:var(--accent); border-color:var(--accent); }
+.contact-grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--sp-8); padding:var(--sp-9) 0; border-top:1px solid var(--line); }
+.contact-block .eyebrow{ margin-bottom:var(--sp-4); }
+.contact-block ul li{ font-family:var(--font-grotesk); font-size:1.1rem; padding:var(--sp-2) 0; border-bottom:1px solid var(--line-soft); }
+.contact-socials a{ display:block; font-family:var(--font-mono); font-size:.85rem; padding:var(--sp-2) 0; border-bottom:1px solid var(--line-soft); transition:color var(--dur-ui) ease; }
+.contact-socials a:hover{ color:var(--accent); }
+@media (max-width:760px){ .contact-grid{ grid-template-columns:1fr; } }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.site-footer{ border-top:1px solid var(--line); padding:var(--sp-9) 0 var(--sp-6); background:var(--ink); color:var(--paper); }
+.footer-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:var(--sp-6); flex-wrap:wrap; margin-bottom:var(--sp-9); }
+.footer-mark{ display:flex; align-items:center; gap:var(--sp-3); }
+.footer-mark .brand-mark{ border-color:var(--paper); }
+.footer-mark .brand-text{ color:var(--paper); }
+.footer-mark .brand-text em{ color:var(--graphite-2); }
+.footer-nav{ display:flex; gap:var(--sp-8); flex-wrap:wrap; }
+.footer-nav div .eyebrow{ color:var(--graphite-2); margin-bottom:var(--sp-3); }
+.footer-nav a,.footer-nav p{ display:block; font-family:var(--font-mono); font-size:.85rem; padding:4px 0; color:var(--paper); }
+.footer-nav a:hover{ color:var(--accent); }
+.footer-big{ font-family:var(--font-display); font-weight:600; font-size:clamp(2.6rem,4vw + 1rem,7rem); letter-spacing:-.02em; line-height:.9; opacity:.94; }
+.footer-bottom{ display:flex; justify-content:space-between; margin-top:var(--sp-6); padding-top:var(--sp-5); border-top:1px solid rgba(242,240,234,.18); font-family:var(--font-mono); font-size:.72rem; color:var(--graphite-2); flex-wrap:wrap; gap:var(--sp-3); }
+.back-top{ color:var(--paper); }
+.back-top:hover{ color:var(--accent); }
+
+@media (max-width:760px){ .footer-top{ flex-direction:column; } }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="transition-veil" id="veil" aria-hidden="true">
+  <svg class="veil-mark" viewBox="0 0 64 64" aria-hidden="true">
+    <circle cx="32" cy="32" r="14" stroke="currentColor" fill="none" stroke-width="1.4"/>
+    <line x1="32" y1="0" x2="32" y2="64" stroke="currentColor" stroke-width="1.4"/>
+    <line x1="0" y1="32" x2="64" y2="32" stroke="currentColor" stroke-width="1.4"/>
+  </svg>
+</div>
+
+<div class="view-cursor" id="viewCursor"><span>View</span></div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#/" class="brand">
+      <span class="brand-mark" aria-hidden="true"><span>JL</span></span>
+      <span class="brand-text">Jonas Lacandola<em>Visual Design</em></span>
+    </a>
+    <nav class="primary-nav" aria-label="Primary" id="primaryNav">
+      <a href="#/" data-route="/">Index</a>
+      <a href="#/work" data-route="/work">Work</a>
+      <a href="#/about" data-route="/about">About</a>
+      <a href="#/contact" data-route="/contact">Contact</a>
+    </nav>
+    <div class="header-status"><span class="status-dot" aria-hidden="true"></span>Available for select projects</div>
+    <button class="menu-toggle" id="menuToggle" aria-expanded="false" aria-controls="mobileMenu">Menu</button>
+  </div>
+</header>
+
+<div class="mobile-menu" id="mobileMenu" hidden>
+  <div class="mobile-menu-top">
+    <span class="brand-mark" aria-hidden="true"><span>JL</span></span>
+    <button class="menu-toggle" id="menuClose">Close</button>
+  </div>
+  <nav class="mobile-menu-list" aria-label="Mobile">
+    <a href="#/" data-route="/">Index</a>
+    <a href="#/work" data-route="/work">Work</a>
+    <a href="#/about" data-route="/about">About</a>
+    <a href="#/contact" data-route="/contact">Contact</a>
+  </nav>
+  <div class="mobile-menu-foot">
+    <p>Pampanga / PH</p>
+    <p>jonas.lacandola@jonasl.online</p>
+  </div>
+</div>
+
+<main id="main">
+
+  <!-- ============================= HOME ============================= -->
+  <section class="view" id="view-home" data-view="/">
+
+    <div class="container opening">
+      <div class="opening-meta">
+        <span>Pampanga / PH</span>
+        <span>Independent Designer</span>
+        <span>2026—</span>
+      </div>
+      <h1 class="opening-headline">
+        <span class="line"><span>Jonas</span></span>
+        <span class="line"><span>Lacandola</span></span>
+      </h1>
+      <div class="opening-figure">
+        <div class="artboard art-1 is-square"><span class="art-mark">N</span></div>
+      </div>
+      <div class="opening-foot">
+        <p class="opening-disciplines">Visual Design <span>/</span> Art Direction <span>/</span> Digital Graphics</p>
+        <p class="opening-status"><strong>Available for select work</strong>Currently booking Q1 2027</p>
+      </div>
+    </div>
+
+    <!-- Selected work -->
+    <div class="container">
+      <div class="section-head" style="padding-top:var(--sp-9)">
+        <div class="section-number">
+          <svg class="reg-mark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><line x1="12" y1="0" x2="12" y2="24"/><line x1="0" y1="12" x2="24" y2="12"/></svg>
+          <span class="eyebrow">02 — Selected Work</span>
+        </div>
+        <a href="#/work" class="link-underline">Full Archive →</a>
+      </div>
+    </div>
+
+    <article class="work-row wr-a">
+      <div class="container grid-12">
+        <span class="wr-num mono">001</span>
+        <a class="wr-art artboard-frame hover-view" href="#/project/nightshift" data-cursor="View Project">
+          <div class="artboard art-1"><span class="art-mark">N</span><span class="art-tag">Nightshift / 2026</span></div>
+        </a>
+        <div class="wr-text wr-copy">
+          <p class="wr-meta">Poster Series / 2026</p>
+          <h3 class="wr-title">Nightshift</h3>
+          <p class="wr-desc">A recurring late-night residency, given a print identity that could run monthly without repeating itself.</p>
+          <a href="#/project/nightshift" class="btn">View Project <span class="btn-arrow">→</span></a>
+        </div>
+      </div>
+    </article>
+
+    <article class="work-row wr-b">
+      <div class="container grid-12">
+        <a class="wr-art artboard-frame hover-view" href="#/project/motion-energy" data-cursor="View Project">
+          <div class="artboard art-2 is-wide"><span class="art-mark">M</span><span class="art-tag">Motion Energy / 2026</span></div>
+        </a>
+        <div class="wr-text wr-copy">
+          <span class="wr-num mono">002</span>
+          <p class="wr-meta">Digital Campaign / 2026</p>
+          <h3 class="wr-title">Motion<br>Energy</h3>
+          <p class="wr-desc">Six weeks of social art direction built around a single recurring angle, not product photography.</p>
+          <a href="#/project/motion-energy" class="btn">View Project <span class="btn-arrow">→</span></a>
+        </div>
+      </div>
+    </article>
+
+    <article class="work-row wr-c">
+      <div class="container grid-12">
+        <a class="wr-art artboard-frame hover-view" href="#/project/local-culture" data-cursor="View Project">
+          <div class="artboard art-4 is-wide"><span class="art-mark">LOCAL CULTURE</span></div>
+        </a>
+        <div class="wr-text wr-copy">
+          <span class="wr-num mono">003</span>
+          <p class="wr-meta">Apparel / Merch — 2026</p>
+          <h3 class="wr-title">Local Culture</h3>
+          <p class="wr-desc">A limited apparel drop where the type is the entire graphic — folded, cropped, printed off-register on purpose.</p>
+          <a href="#/project/local-culture" class="btn">View Project <span class="btn-arrow">→</span></a>
+        </div>
+      </div>
+    </article>
+
+    <!-- Disciplines index -->
+    <div class="container section">
+      <div class="section-head">
+        <div class="section-number">
+          <svg class="reg-mark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><line x1="12" y1="0" x2="12" y2="24"/><line x1="0" y1="12" x2="24" y2="12"/></svg>
+          <span class="eyebrow">03 — Working Across</span>
+        </div>
+      </div>
+      <div class="disciplines">
+        <a class="disc-row" href="#/work?cat=Poster">
+          <span class="disc-num mono">01</span><span class="disc-name">Posters</span><span class="disc-count mono">04</span>
+          <div class="disc-thumb artboard art-1"><span class="art-mark" style="font-size:70px">N</span></div>
+        </a>
+        <a class="disc-row" href="#/work?cat=Social">
+          <span class="disc-num mono">02</span><span class="disc-name">Social</span><span class="disc-count mono">02</span>
+          <div class="disc-thumb artboard art-3"></div>
+        </a>
+        <a class="disc-row" href="#/work?cat=Merch">
+          <span class="disc-num mono">03</span><span class="disc-name">Merch</span><span class="disc-count mono">02</span>
+          <div class="disc-thumb artboard art-4"></div>
+        </a>
+        <a class="disc-row" href="#/work?cat=Brand">
+          <span class="disc-num mono">04</span><span class="disc-name">Brand</span><span class="disc-count mono">01</span>
+          <div class="disc-thumb artboard art-5"></div>
+        </a>
+        <a class="disc-row" href="#/work?cat=Experiment">
+          <span class="disc-num mono">05</span><span class="disc-name">Experiments</span><span class="disc-count mono">02</span>
+          <div class="disc-thumb artboard art-6"></div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Philosophy -->
+    <div class="container statement">
+      <blockquote>“Good design isn't added. It's what survives the editing.”</blockquote>
+      <cite>— Working note, 2026</cite>
+    </div>
+
+    <!-- More work -->
+    <div class="container">
+      <div class="section-head">
+        <div class="section-number">
+          <svg class="reg-mark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><line x1="12" y1="0" x2="12" y2="24"/><line x1="0" y1="12" x2="24" y2="12"/></svg>
+          <span class="eyebrow">05 — More Selected Work</span>
+        </div>
+      </div>
+    </div>
+
+    <article class="work-row wr-d">
+      <div class="container grid-12">
+        <div class="wr-art-pair">
+          <a class="artboard-frame hover-view" href="#/project/kavanagh-summer" data-cursor="View Project">
+            <div class="artboard art-3 is-square"><span class="art-mark" style="font-size:70px">K</span></div>
+          </a>
+          <a class="artboard-frame hover-view" href="#/project/paper-trail" data-cursor="View Project" style="margin-top:var(--sp-8)">
+            <div class="artboard art-5 is-square"><span class="art-mark" style="font-size:44px">P</span></div>
+          </a>
+        </div>
+        <div class="wr-text wr-copy">
+          <span class="wr-num mono">004 / 005</span>
+          <p class="wr-meta">Social &amp; Brand — 2025</p>
+          <h3 class="wr-title" style="font-size:var(--fs-section)">Kavanagh Summer<br>Paper Trail</h3>
+          <p class="wr-desc">A market's seasonal identity, and a print studio's mark built from its own registration lines.</p>
+          <a href="#/work" class="link-underline">See Full Archive →</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- About teaser -->
+    <div class="container teaser">
+      <div class="teaser-grid">
+        <div>
+          <span class="eyebrow" style="display:block;margin-bottom:var(--sp-4)">06 — About</span>
+          <h3>Design is how I organize attention.</h3>
+        </div>
+        <div>
+          <p>Jonas Lacandola is an independent visual designer working out of Pampanga, building graphic systems for campaigns, posters, social content, merch and identities.</p>
+          <a href="#/about" class="btn">Read More <span class="btn-arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact teaser -->
+    <div class="container teaser">
+      <div class="teaser-grid">
+        <div>
+          <span class="eyebrow" style="display:block;margin-bottom:var(--sp-4)">07 — Contact</span>
+          <h3>Have something<br>worth making?</h3>
+        </div>
+        <div>
+          <p>Available for freelance, contract and creative collaborations.</p>
+          <a href="#/contact" class="btn">Start a Conversation <span class="btn-arrow">→</span></a>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================= WORK ARCHIVE ============================= -->
+  <section class="view" id="view-work" data-view="/work" hidden>
+    <div class="container page-head">
+      <span class="eyebrow page-eyebrow">Work / Archive</span>
+      <h1>Selected &amp; Ongoing Work</h1>
+    </div>
+    <div class="container archive-controls">
+      <div class="filter-list" id="filterList"></div>
+      <div class="view-toggle" id="viewToggle">
+        <button data-mode="visual" class="is-active">Visual View</button>
+        <button data-mode="index">Index View</button>
+      </div>
+    </div>
+    <div class="container">
+      <div class="archive-visual" id="archiveVisual"></div>
+      <div class="archive-index" id="archiveIndex" hidden></div>
+    </div>
+    <div style="height:var(--sp-10)"></div>
+  </section>
+
+  <!-- ============================= PROJECT DETAIL ============================= -->
+  <section class="view" id="view-project" data-view="/project" hidden>
+    <div class="container project-head">
+      <a href="#/work" class="back-link mono"><span>←</span> Back to Work</a>
+      <p class="eyebrow project-eyebrow" id="pjEyebrow">Project 001</p>
+      <h1 class="project-title" id="pjTitle">Title</h1>
+      <div class="project-meta-row">
+        <div><p class="pm-label">Category / Year</p><p class="pm-value" id="pjCatYear">—</p></div>
+        <div><p class="pm-label">Role</p><p class="pm-value" id="pjRole">—</p></div>
+        <div><p class="pm-label">Discipline</p><p class="pm-value" id="pjDiscipline">—</p></div>
+        <div><p class="pm-label">Status</p><p class="pm-value">Published</p></div>
+      </div>
+    </div>
+
+    <div class="container project-hero">
+      <div class="artboard" id="pjHero"><span class="art-mark" id="pjHeroMark"></span></div>
+    </div>
+
+    <div class="container project-narrative">
+      <div><p class="pn-label">The Brief</p><p id="pjBrief"></p></div>
+      <div><p class="pn-label">The Direction</p><p id="pjDirection"></p></div>
+      <div><p class="pn-label">The Result</p><p id="pjResult"></p></div>
+    </div>
+
+    <div class="container project-gallery" id="pjGallery"></div>
+
+    <div class="container next-project">
+      <p class="eyebrow np-label">Next Project</p>
+      <a class="next-project-link" id="pjNext" href="#/project/">
+        <div>
+          <span class="mono eyebrow" id="pjNextNum">002</span>
+          <h3 class="np-title" id="pjNextTitle">Next</h3>
+        </div>
+        <div class="artboard" id="pjNextArt"></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============================= ABOUT ============================= -->
+  <section class="view" id="view-about" data-view="/about" hidden>
+    <div class="container about-open">
+      <span class="eyebrow" style="display:block;margin-bottom:var(--sp-5)">About</span>
+      <h1>Design is how I organize attention.</h1>
+    </div>
+    <div class="container about-bio">
+      <div>
+        <span class="eyebrow">Profile</span>
+      </div>
+      <div>
+        <p>Jonas Lacandola is an independent visual designer working out of Pampanga, Philippines — building graphic systems for campaigns, posters, social content, merchandise and brand identities.</p>
+        <p style="margin-top:var(--sp-5)">His process moves through experimentation, iteration and refinement: a strong concept gets pressure-tested until only the necessary parts remain. He's as comfortable inside a tight brand system as he is inventing one from nothing.</p>
+      </div>
+    </div>
+    <div class="container capabilities">
+      <span class="eyebrow" style="display:block;margin-bottom:var(--sp-6)">Capabilities</span>
+      <div class="cap-list">
+        <div class="cap-row"><span class="cap-num mono">01</span><span class="cap-name">Visual Design</span></div>
+        <div class="cap-row"><span class="cap-num mono">02</span><span class="cap-name">Social Content</span></div>
+        <div class="cap-row"><span class="cap-num mono">03</span><span class="cap-name">Poster Design</span></div>
+        <div class="cap-row"><span class="cap-num mono">04</span><span class="cap-name">Campaign Creative</span></div>
+        <div class="cap-row"><span class="cap-num mono">05</span><span class="cap-name">Merch Graphics</span></div>
+        <div class="cap-row"><span class="cap-num mono">06</span><span class="cap-name">Digital Design</span></div>
+      </div>
+    </div>
+    <div class="container tools-row">
+      <div><span class="eyebrow">Tools / Workflow</span></div>
+      <div class="tools-list">
+        <span>Adobe Photoshop</span><span>Adobe Illustrator</span><span>Figma</span><span>Canva</span><span>AI-assisted ideation</span>
+      </div>
+    </div>
+    <div class="container teaser" style="border-top:none">
+      <a href="#/contact" class="btn">Get in Touch <span class="btn-arrow">→</span></a>
+    </div>
+  </section>
+
+  <!-- ============================= CONTACT ============================= -->
+  <section class="view" id="view-contact" data-view="/contact" hidden>
+    <div class="container contact-open">
+      <span class="eyebrow" style="display:block;margin-bottom:var(--sp-5)">Contact</span>
+      <h1>Have something worth making?</h1>
+      <a class="contact-email" href="mailto:jonas.lacandola@jonasl.online">jonas.lacandola@jonasl.online</a>
+    </div>
+    <div class="container contact-grid">
+      <div class="contact-block">
+        <span class="eyebrow">Available For</span>
+        <ul><li>Freelance</li><li>Contract</li><li>Creative Collaborations</li></ul>
+      </div>
+      <div class="contact-block contact-socials">
+        <span class="eyebrow">Elsewhere</span>
+        <a href="#">Instagram</a><a href="#">Behance</a><a href="#">LinkedIn</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-mark">
+        <span class="brand-mark" aria-hidden="true"><span>JL</span></span>
+        <span class="brand-text">Jonas Lacandola<em>Pampanga / PH</em></span>
+      </div>
+      <nav class="footer-nav">
+        <div>
+          <span class="eyebrow">Site</span>
+          <a href="#/">Index</a><a href="#/work">Work</a><a href="#/about">About</a><a href="#/contact">Contact</a>
+        </div>
+        <div>
+          <span class="eyebrow">Elsewhere</span>
+          <a href="mailto:jonas.lacandola@jonasl.online">Email</a><a href="#">Instagram</a><a href="#">Behance</a><a href="#">LinkedIn</a>
+        </div>
+      </nav>
+    </div>
+    <p class="footer-big">Jonas Lacandola</p>
+    <div class="footer-bottom">
+      <span>© 2026 Jonas Lacandola. Design &amp; direction, self.</span>
+      <button class="back-top" id="backTop">Back to Top ↑</button>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var projects = [
+    { id:1, slug:'nightshift', num:'001', title:'Nightshift', category:'Poster', year:'2026', role:'Visual Design', discipline:'Poster / Typography', art:'art-1', mark:'N',
+      short:'A poster series for a recurring late-night music residency.',
+      brief:'The residency needed a print identity that could run monthly without repeating itself, while staying recognisable on a wall of other flyers.',
+      direction:'A single oversized numeral anchors every poster, paired with a tight grotesk running text and a deliberately narrow colour range — ink, paper, one flash of cobalt reserved for the date.',
+      result:'Six posters, one system. The numeral became the thing people photographed and shared before they even read the lineup.',
+      gallery:['art-1','art-7','art-9'] },
+    { id:2, slug:'motion-energy', num:'002', title:'Motion Energy', category:'Social', year:'2026', role:'Art Direction', discipline:'Digital Campaign / Social', art:'art-2', mark:'M',
+      short:'A six-week social campaign, art directed around movement rather than product shots.',
+      brief:'Move the conversation away from can photography and toward the feeling the product is sold on — motion, heat, momentum.',
+      direction:'Diagonal splits and motion-line typography stand in for photography. Every asset shares the same twelve degree angle so the feed reads as one continuous gesture.',
+      result:'A modular system the client\u2019s internal team could keep producing after handover, without losing the angle that made it recognisable.',
+      gallery:['art-2','art-3','art-6'] },
+    { id:3, slug:'kavanagh-summer', num:'003', title:'Kavanagh Summer', category:'Social', year:'2025', role:'Visual Design', discipline:'Social Content', art:'art-3', mark:'K',
+      short:'A season of social content for a local summer market.',
+      brief:'Give a volunteer-run market a visual identity confident enough to compete with branded activations nearby.',
+      direction:'A single halftone sun mark repeats across every post at a different scale, holding the season together across a dozen contributors.',
+      result:'Vendor sign-ups doubled from the previous year; several vendors began requesting the mark for their own stalls.',
+      gallery:['art-3','art-9','art-1'] },
+    { id:4, slug:'local-culture', num:'004', title:'Local Culture', category:'Merch', year:'2026', role:'Visual Design', discipline:'Apparel / Merch Graphics', art:'art-4', mark:'LC',
+      short:'A small apparel drop celebrating regional slang.',
+      brief:'Make merch that reads as a limited print object, not a logo tee.',
+      direction:'Type treated as the entire graphic — folded, cropped, printed off-register on purpose — so each shirt reads like a poster you can wear.',
+      result:'The first run sold out in four days without any paid promotion.',
+      gallery:['art-4','art-8','art-5'] },
+    { id:5, slug:'paper-trail', num:'005', title:'Paper Trail', category:'Brand', year:'2025', role:'Visual Identity', discipline:'Brand / Identity', art:'art-5', mark:'P',
+      short:'A quiet identity system for an independent print studio.',
+      brief:'A print studio needed a mark that referenced their own production process without becoming a gimmick.',
+      direction:'The identity borrows directly from the studio\u2019s press floor — crop marks, colour bars, fold lines — reduced to a restrained monochrome system.',
+      result:'An identity flexible enough to sit on business cards and shopfront signage without a single custom asset.',
+      gallery:['art-5','art-9','art-7'] },
+    { id:6, slug:'static-bloom', num:'006', title:'Static Bloom', category:'Experiment', year:'2026', role:'Self-Initiated', discipline:'Generative / Experimental', art:'art-6', mark:'S',
+      short:'A self-initiated study in generative colour fields.',
+      brief:'No brief — a personal study made between client work to keep the eye loose.',
+      direction:'Layered gradients and a single recurring bloom shape, pushed further into colour and noise than any client project would allow.',
+      result:'Two motifs from this study later found their way into Motion Energy and Kavanagh Summer.',
+      gallery:['art-6','art-2','art-3'] },
+    { id:7, slug:'heatline', num:'007', title:'Heatline', category:'Poster', year:'2025', role:'Visual Design', discipline:'Poster / Type', art:'art-7', mark:'H',
+      short:'A single-poster commission for a boxing card.',
+      brief:'One poster, one week, and a fight card with no confirmed final lineup at time of design.',
+      direction:'A modular type grid built to absorb late name changes without a full redesign, anchored by one aggressive diagonal.',
+      result:'Reprinted twice after the original run sold out at the venue.',
+      gallery:['art-7','art-1','art-4'] },
+    { id:8, slug:'signal-drift', num:'008', title:'Signal Drift', category:'Merch', year:'2026', role:'Visual Design', discipline:'Apparel / Merch Graphics', art:'art-8', mark:'SD',
+      short:'A capsule merch concept exploring scattered grid systems.',
+      brief:'A personal concept exploring what a "system" looks like when deliberately knocked off-grid.',
+      direction:'A strict dot grid, then intentionally displaced, printed across sleeves and hemlines rather than centred on the chest.',
+      result:'Developed as a concept piece; shortlisted with a small-run production partner.',
+      gallery:['art-8','art-6','art-9'] },
+    { id:9, slug:'grid-study-04', num:'009', title:'Grid Study 04', category:'Experiment', year:'2026', role:'Self-Initiated', discipline:'Generative / Experimental', art:'art-9', mark:'04',
+      short:'The fourth in an ongoing series of Swiss-grid studies.',
+      brief:'An ongoing practice piece: take a strict module grid and break exactly one rule.',
+      direction:'A twelve-unit grid with a single cobalt module pushed off-axis — everything else stays locked.',
+      result:'Part of an ongoing series; referenced internally when defining the site\u2019s own underlying grid.',
+      gallery:['art-9','art-5','art-1'] }
+  ];
+
+  var categories = ['All','Poster','Social','Merch','Brand','Experiment'];
+  var visualSpans = [8,4,4,8,6,6,5,7,12];
+  var currentFilter = 'All';
+  var currentMode = 'visual';
+
+  function artboardHTML(cls, mark, extraClass){
+    var gridLines = cls === 'art-9' ? buildGridLines() : '';
+    return '<div class="artboard '+cls+(extraClass?(' '+extraClass):'')+'">'+gridLines+(mark?('<span class="art-mark">'+mark+'</span>'):'')+'</div>';
+  }
+  function buildGridLines(){
+    var s = '<div class="grid-lines">';
+    for(var i=0;i<36;i++){ s += '<div></div>'; }
+    s += '</div>';
+    return s;
+  }
+
+  function byId(id){ return document.getElementById(id); }
+
+  /* ---------- Filter pills ---------- */
+  function renderFilters(){
+    var el = byId('filterList');
+    el.innerHTML = categories.map(function(cat){
+      var count = cat === 'All' ? projects.length : projects.filter(function(p){return p.category===cat;}).length;
+      var active = cat === currentFilter ? ' is-active' : '';
+      return '<button class="'+active.trim()+'" data-cat="'+cat+'">'+cat+' <sup>'+String(count).padStart(2,'0')+'</sup></button>';
+    }).join('');
+    el.querySelectorAll('button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        currentFilter = btn.getAttribute('data-cat');
+        renderFilters(); renderArchive();
+      });
+    });
+  }
+
+  /* ---------- Visual + Index archive ---------- */
+  function filteredProjects(){
+    return currentFilter === 'All' ? projects : projects.filter(function(p){return p.category===currentFilter;});
+  }
+
+  function renderArchive(){
+    var list = filteredProjects();
+    var visualEl = byId('archiveVisual');
+    var indexEl = byId('archiveIndex');
+
+    visualEl.innerHTML = list.map(function(p,i){
+      var span = visualSpans[i % visualSpans.length];
+      return '<a class="archive-item artboard-frame hover-view" style="grid-column:span '+span+'" href="#/project/'+p.slug+'" data-cursor="View Project">'+
+        artboardHTML(p.art, p.mark)+
+        '<div class="frame-meta"><span class="frame-title">'+p.title+'</span><span>'+p.num+' — '+p.category+'</span></div>'+
+      '</a>';
+    }).join('');
+
+    indexEl.innerHTML = '<div class="index-head"><span>No.</span><span>Title</span><span class="ih-cat">Category</span><span class="ih-year">Year</span><span class="ih-view"></span></div>' +
+      list.map(function(p){
+        return '<a class="index-row" href="#/project/'+p.slug+'">'+
+          '<span>'+p.num+'</span><span class="idx-title">'+p.title+'</span><span class="idx-cat">'+p.category+'</span><span class="idx-year">'+p.year+'</span><span class="idx-view">View →</span>'+
+        '</a>';
+      }).join('');
+  }
+
+  function setMode(mode){
+    currentMode = mode;
+    byId('viewToggle').querySelectorAll('button').forEach(function(b){ b.classList.toggle('is-active', b.getAttribute('data-mode')===mode); });
+    byId('archiveVisual').hidden = mode !== 'visual';
+    byId('archiveIndex').hidden = mode !== 'index';
+  }
+  byId('viewToggle').addEventListener('click', function(e){
+    var btn = e.target.closest('button'); if(!btn) return;
+    setMode(btn.getAttribute('data-mode'));
+  });
+
+  /* ---------- Project detail ---------- */
+  function renderProject(slug){
+    var p = projects.find(function(pr){ return pr.slug === slug; }) || projects[0];
+    byId('pjEyebrow').textContent = 'Project ' + p.num;
+    byId('pjTitle').textContent = p.title;
+    byId('pjCatYear').textContent = p.category + ' / ' + p.year;
+    byId('pjRole').textContent = p.role;
+    byId('pjDiscipline').textContent = p.discipline;
+    var hero = byId('pjHero');
+    hero.className = 'artboard ' + p.art;
+    hero.innerHTML = (p.art==='art-9'?buildGridLines():'') + '<span class="art-mark">'+p.mark+'</span>';
+    byId('pjBrief').textContent = p.brief;
+    byId('pjDirection').textContent = p.direction;
+    byId('pjResult').textContent = p.result;
+
+    var g = p.gallery || [];
+    var slots = ['pg-a','pg-b','pg-c'];
+    byId('pjGallery').innerHTML = g.map(function(art,i){
+      return '<div class="'+ (slots[i]||'pg-c') +'">' + artboardHTML(art,'') + '</div>';
+    }).join('');
+
+    var nextIdx = p.id % projects.length; // wraps
+    var next = projects[nextIdx];
+    byId('pjNext').setAttribute('href', '#/project/'+next.slug);
+    byId('pjNextNum').textContent = 'Project ' + next.num;
+    byId('pjNextTitle').textContent = next.title;
+    var nextArt = byId('pjNextArt');
+    nextArt.className = 'artboard ' + next.art;
+    nextArt.innerHTML = (next.art==='art-9'?buildGridLines():'') + '<span class="art-mark">'+next.mark+'</span>';
+  }
+
+  /* ---------- Router ---------- */
+  var views = document.querySelectorAll('.view');
+  var veil = byId('veil');
+  var pendingHash = null;
+
+  function parseHash(){
+    var h = location.hash.replace(/^#/,'') || '/';
+    var qIndex = h.indexOf('?');
+    var query = {};
+    if(qIndex > -1){
+      var qs = h.slice(qIndex+1); h = h.slice(0,qIndex);
+      qs.split('&').forEach(function(pair){ var kv=pair.split('='); if(kv[0]) query[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]||''); });
+    }
+    var parts = h.split('/').filter(Boolean);
+    return { path:h, parts:parts, query:query };
+  }
+
+  function applyRoute(){
+    var r = parseHash();
+    var routeKey = '/' + (parts0(r));
+    if(r.parts[0]==='project'){ routeKey='/project'; }
+
+    views.forEach(function(v){ v.hidden = v.getAttribute('data-view') !== routeKey; });
+
+    document.querySelectorAll('.primary-nav a, .mobile-menu-list a').forEach(function(a){
+      a.classList.toggle('is-active', a.getAttribute('data-route')===routeKey || (routeKey==='/project' && a.getAttribute('data-route')==='/work'));
+    });
+
+    if(routeKey === '/work'){
+      if(r.query.cat && categories.indexOf(r.query.cat) > -1){ currentFilter = r.query.cat; }
+      renderFilters(); renderArchive(); setMode(currentMode);
+    }
+    if(routeKey === '/project'){
+      renderProject(r.parts[1] || 'nightshift');
+    }
+    window.scrollTo({top:0, behavior:'auto'});
+  }
+  function parts0(r){ return r.parts[0] || ''; }
+
+  function navigateWithTransition(){
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){ applyRoute(); return; }
+    veil.classList.add('is-covering');
+    setTimeout(function(){
+      applyRoute();
+      veil.classList.remove('is-covering');
+      veil.classList.add('is-leaving');
+      setTimeout(function(){ veil.classList.remove('is-leaving'); }, 700);
+    }, 340);
+  }
+
+  var isFirstLoad = true;
+  window.addEventListener('hashchange', function(){
+    if(isFirstLoad){ isFirstLoad = false; }
+    navigateWithTransition();
+    closeMobileMenu();
+  });
+
+  /* ---------- Mobile menu ---------- */
+  var mobileMenu = byId('mobileMenu');
+  var menuToggle = byId('menuToggle');
+  function openMobileMenu(){ mobileMenu.hidden=false; menuToggle.setAttribute('aria-expanded','true'); byId('menuClose').focus(); }
+  function closeMobileMenu(){ mobileMenu.hidden=true; menuToggle.setAttribute('aria-expanded','false'); }
+  menuToggle.addEventListener('click', openMobileMenu);
+  byId('menuClose').addEventListener('click', closeMobileMenu);
+  document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeMobileMenu(); });
+
+  /* ---------- Back to top ---------- */
+  byId('backTop').addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+
+  /* ---------- View cursor ---------- */
+  var cursorEl = byId('viewCursor');
+  if(matchMedia('(pointer:fine)').matches){
+    document.addEventListener('mousemove', function(e){
+      cursorEl.style.transform = 'translate('+(e.clientX+16)+'px,'+(e.clientY+16)+'px)';
+    });
+    document.addEventListener('mouseover', function(e){
+      var target = e.target.closest('.hover-view');
+      if(target){
+        cursorEl.querySelector('span').textContent = target.getAttribute('data-cursor') || 'View';
+        cursorEl.classList.add('is-visible');
+      }
+    });
+    document.addEventListener('mouseout', function(e){
+      var target = e.target.closest('.hover-view');
+      var related = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('.hover-view') : null;
+      if(target && !related){ cursorEl.classList.remove('is-visible'); }
+    });
+  }
+
+  /* ---------- Init ---------- */
+  renderFilters();
+  renderArchive();
+  applyRoute();
+
+})();
+</script>
+</body>
+</html>

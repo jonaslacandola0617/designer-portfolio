@@ -1,0 +1,344 @@
+html:has(.register-admin) {
+  font-size: 15px;
+}
+.transition-veil{visibility:hidden}
+.transition-veil.is-covering,.transition-veil.is-leaving{visibility:visible}
+.register-admin .login-box .btn.full{margin-top:16px}
+.register-admin .settings-form textarea[name=longBio]{min-height:120px}
+[hidden] {
+  display: none !important;
+}
+.register-admin {
+  min-height: 100vh;
+}
+.register-public .artboard img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.register-public .artboard[data-aspect="LANDSCAPE"] {
+  aspect-ratio: 16/10;
+}
+.register-public .artboard[data-aspect="SQUARE"] {
+  aspect-ratio: 1;
+}
+.register-public .artboard[data-aspect="WIDE"] {
+  aspect-ratio: 16/9;
+}
+.register-public .project-hero .artboard {
+  aspect-ratio: 16/9;
+}
+.register-public .next-project-link .artboard {
+  aspect-ratio: 4/3;
+}
+.register-public .opening-figure .artboard {
+  aspect-ratio: 1;
+}
+.preserve-lines {
+  white-space: pre-line;
+}
+.register-public .mobile-menu {
+  margin: 0;
+  border: 0;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  color: var(--ink);
+}
+.register-public .primary-nav a.is-active::after {
+  background: var(--ink);
+}
+.register-public .index-row:focus-visible .idx-view {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .hover-view {
+    cursor: pointer;
+  }
+  .disc-thumb {
+    display: none;
+  }
+}
+.register-admin .admin-nav a {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--graphite);
+  padding: 6px 2px;
+  border-bottom: 2px solid transparent;
+  transition:
+    color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease);
+}
+.register-admin .admin-nav a.is-active,
+.register-admin .admin-nav a:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+}
+.register-admin .field input:focus-visible,
+.register-admin .field select:focus-visible,
+.register-admin .field textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.register-admin .row-actions a {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.register-admin .row-actions a:hover {
+  color: var(--accent);
+}
+.register-admin .table-row .row-actions {
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.register-admin .table-number {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+.register-admin .reorder-handle {
+  touch-action: none;
+  cursor: grab;
+  color: var(--graphite);
+  font-size: 0.75rem;
+}
+.register-admin .gallery-grid .sortable-item {
+  min-width: 0;
+}
+.register-admin .gallery-tile .grip {
+  touch-action: none;
+  cursor: grab;
+  z-index: 2;
+}
+.register-admin .gallery-tile .g-del {
+  z-index: 3;
+}
+.register-admin .gallery-tile .tile-edit {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.register-admin .field-note {
+  font-size: 0.72rem;
+  color: var(--graphite);
+  margin-top: var(--sp-2);
+}
+.register-admin .text-action {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--line);
+  padding: 4px 0;
+}
+.register-admin .text-action:hover {
+  color: var(--accent);
+}
+.register-admin .media-tile:focus-within .m-actions {
+  opacity: 1;
+}
+.register-admin .status-pill.archived .dot {
+  background: var(--graphite);
+}
+.register-admin .dialog {
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  padding: var(--sp-6);
+  max-width: 720px;
+  width: calc(100% - 40px);
+  max-height: 90svh;
+  overflow: auto;
+}
+.register-admin .dialog::backdrop {
+  background: rgba(17, 17, 17, 0.5);
+}
+.register-admin .dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-5);
+}
+.register-admin .dialog-head h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.register-admin .dialog .media-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+.register-admin .dialog .preview-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 320px;
+  object-fit: contain;
+  margin-bottom: var(--sp-5);
+}
+.register-admin .inline-actions {
+  display: flex;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+  align-items: center;
+}
+.register-admin .form-error {
+  color: var(--ink);
+  border-left: 2px solid var(--accent);
+  padding: var(--sp-3);
+  margin: var(--sp-4) 0;
+  font-size: 0.85rem;
+}
+.register-admin .toast {
+  max-width: calc(100vw - 40px);
+  text-align: center;
+}
+.register-admin .empty-note {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--graphite);
+  padding: var(--sp-6) 0;
+  border-bottom: 1px solid var(--line);
+}
+.register-admin details {
+  margin-top: var(--sp-5);
+}
+.register-admin summary {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  margin-bottom: var(--sp-4);
+}
+.register-admin .screen {
+  min-height: calc(100vh - 64px);
+}
+.register-admin #screen-login {
+  min-height: 100vh;
+}
+@media (max-width: 760px) {
+  .register-admin .admin-header-inner {
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+  }
+  .register-admin .admin-nav {
+    order: 3;
+    width: 100%;
+  }
+  .register-admin .admin-header-actions {
+    margin-left: auto;
+    gap: var(--sp-3);
+  }
+  .register-admin .media-tile .m-actions {
+    opacity: 1;
+    inset: auto 0 24px;
+    padding: 8px;
+    background: rgba(17, 17, 17, 0.72);
+  }
+  .register-admin .save-bar {
+    flex-wrap: wrap;
+  }
+  .register-admin .gallery-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+:root,
+.register-admin {
+  --font-display: var(--register-fraunces), Georgia, serif;
+  --font-grotesk: var(--register-grotesk), Arial, sans-serif;
+  --font-mono: var(--register-mono), Consolas, monospace;
+}
+.register-admin .plain-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.register-admin .field-label {
+  display: block;
+  margin-bottom: 32px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--graphite);
+}
+.register-admin .field-label input,
+.register-admin .field-label select {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 10px 2px;
+  font-family: var(--font-grotesk);
+  font-size: 1rem;
+  margin-top: 8px;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.register-admin .admin-order-actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 32px;
+}
+.register-admin .editor-preview {
+  aspect-ratio: 4/5;
+  overflow: hidden;
+}
+.register-admin .editor-preview img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+.register-admin .drag-handle {
+  touch-action: none;
+  cursor: grab;
+}
+.register-admin .settings-form {
+  max-width: 760px;
+}
+.register-admin .container:has(>div>.settings-form){max-width:760px}
+.register-admin .dialog .artwork{max-height:300px;width:100%;object-fit:contain}
+.register-public .project-gallery figure{margin-top:0}
+.register-public .project-gallery figure.pg-b{margin-top:var(--sp-9)}
+@media(max-width:860px){.register-public .project-gallery figure.pg-b{margin-top:0}}
+.register-admin .fs-label {
+  display: block;
+  margin-bottom: 16px;
+}
+.register-admin .settings-fields {
+  margin-top: 24px;
+}
+.register-admin .notice {
+  margin: 16px 0;
+  font-size: 0.85rem;
+}
+.register-admin .gallery-grid .sortable-item {
+  aspect-ratio: 1;
+}
+.register-admin .gallery-grid > .sortable-item .gallery-tile {
+  height: 100%;
+}
+.register-admin .media-tile .artwork {
+  display: block;
+}

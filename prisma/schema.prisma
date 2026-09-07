@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ProjectStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum MediaLayout {
+  LARGE
+  OFFSET_SMALL
+  FULL_WIDTH
+  FULL
+  WIDE
+  HALF
+  PAIR_LEFT
+  PAIR_RIGHT
+  DETAIL
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String
+  slug      String    @unique
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  projects  Project[]
+}
+
+model Project {
+  archiveNumber Int @unique @default(autoincrement())
+  titleLines String @default("")
+  brief String @default("")
+  direction String @default("")
+  result String @default("")
+  homeLayout String @default("A")
+  artworkAspect String @default("PORTRAIT")
+  id               String         @id @default(cuid())
+  title            String
+  slug             String         @unique
+  categoryId       String
+  category         Category       @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  year             Int
+  shortDescription String         @default("")
+  projectContext   String         @default("")
+  role             String         @default("")
+  disciplines      String[]
+  tools            String[]
+  coverImageId     String?
+  coverImage       MediaAsset?    @relation("Cover", fields: [coverImageId], references: [id], onDelete: Restrict)
+  featured         Boolean        @default(false)
+  status           ProjectStatus  @default(DRAFT)
+  sortOrder        Int            @default(0)
+  seoTitle         String         @default("")
+  seoDescription   String         @default("")
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  publishedAt      DateTime?
+  gallery          ProjectMedia[]
+
+  @@index([status, sortOrder])
+  @@index([sortOrder])
+  @@index([featured, status, sortOrder])
+  @@index([categoryId])
+}
+
+model MediaAsset {
+  id         String         @id @default(cuid())
+  storageKey String         @unique
+  url        String
+  fileName   String
+  mimeType   String
+  fileSize   Int
+  width      Int?
+  height     Int?
+  altText    String         @default("")
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  covers     Project[]      @relation("Cover")
+  projects   ProjectMedia[]
+  settings   SiteSettings[]
+}
+
+model ProjectMedia {
+  id        String      @id @default(cuid())
+  projectId String
+  project   Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  mediaId   String
+  media     MediaAsset  @relation(fields: [mediaId], references: [id], onDelete: Restrict)
+  sortOrder Int         @default(0)
+  caption   String      @default("")
+  layout    MediaLayout @default(FULL)
+
+  @@unique([projectId, mediaId])
+  @@index([projectId, sortOrder])
+  @@index([mediaId])
+}
+
+model SiteSettings {
+  aboutHeadline String @default("Design is how I organize attention.")
+  contactHeadline String @default("Have something\nworth making?")
+  statement String @default("")
+  statementAttribution String @default("")
+  bookingText String @default("")
+  openingEdition String @default("")
+  introDisciplines String[] @default([])
+  workflowTools String[] @default([])
+  availableFor String[] @default([])
+  id                    String      @id @default("site")
+  designerName          String
+  professionalTitle     String
+  email                 String      @default("")
+  location              String      @default("")
+  availabilityText      String      @default("")
+  shortBio              String      @default("")
+  longBio               String      @default("")
+  capabilities          String[]
+  instagramUrl          String      @default("")
+  behanceUrl            String      @default("")
+  linkedinUrl           String      @default("")
+  githubUrl             String      @default("")
+  defaultSeoTitle       String
+  defaultSeoDescription String
+  socialImageId         String?
+  socialImage           MediaAsset? @relation(fields: [socialImageId], references: [id], onDelete: Restrict)
+  createdAt             DateTime    @default(now())
+  updatedAt             DateTime    @updatedAt
+}
+
+model LoginAttempt {
+  key       String   @id
+  count     Int      @default(1)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+}
+
+model UploadIntent {
+  id         String   @id @default(cuid())
+  adminId    String
+  storageKey String   @unique
+  fileName   String
+  mimeType   String
+  fileSize   Int
+  expiresAt  DateTime
+
+  @@index([expiresAt])
+}
+
+model StorageDeletion {
+  id         String   @id @default(cuid())
+  storageKey String   @unique
+  createdAt  DateTime @default(now())
+}

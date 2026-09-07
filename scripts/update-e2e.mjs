@@ -1,0 +1,17 @@
+import {readFileSync,writeFileSync} from "node:fs";
+let p=readFileSync("tests/e2e/portfolio.spec.ts","utf8");
+p=p.replace('name: "Sign in"','name: "Enter Studio →"').replace('name: "New project"','name: "+ New project"').replace('name: "Log out"','name: "Sign out"');
+p=p.replace('.getByLabel("Project context", { exact: true })','.getByLabel("Brief", { exact: true })');
+const start=p.indexOf('  await page\n    .getByRole("combobox", { name: "Cover artwork"');
+const end=p.indexOf('  await page\n    .getByLabel("Caption"',start);
+p=p.slice(0,start)+`  await page.getByRole("button",{name:"Upload cover artwork",exact:true}).click();
+  await page.getByRole("button",{name:"Select sample-nightshift.svg",exact:true}).click();
+  await page.getByRole("button",{name:"Add gallery image",exact:true}).click();
+  await page.getByRole("button",{name:"Select sample-motion-energy.svg",exact:true}).click();
+  await page.getByRole("button",{name:"Edit gallery image sample-motion-energy.svg",exact:true}).click();
+`+p.slice(end);
+p=p.replace('.selectOption("WIDE");','.selectOption("FULL_WIDTH");\n  await page.getByRole("button",{name:"Close dialog"}).click();');
+p=p.replaceAll('publicPage.getByRole("heading", { name: title, exact: true })','publicPage.getByText(title, { exact: true }).first()');
+p=p.replace('  await page\n    .getByRole("button", { name: "Move down"','  await page.getByRole("button",{name:"Manage order",exact:true}).click();\n  await page\n    .getByRole("button", { name: "Move down"');
+p=p.replace('  const row = page','  await page.getByRole("button",{name:"Manage order",exact:true}).click();\n  const row = page');
+writeFileSync("tests/e2e/portfolio.spec.ts",p);

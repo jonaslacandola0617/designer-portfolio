@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Admin — Jonas Lacandola</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='4' y='4' width='56' height='56' fill='%23111111'/%3E%3Ctext x='32' y='42' font-family='Georgia,serif' font-weight='700' font-size='28' fill='%23F2F0EA' text-anchor='middle'%3EJL%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Space+Grotesk:wght@300..700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Same studio, different room — shared tokens, tighter execution. */
+:root{
+  --paper:#F2F0EA; --paper-2:#EAE6DB; --paper-3:#FBFAF7;
+  --ink:#111111; --ink-soft:#23221F; --graphite:#6E6B65; --graphite-2:#96938B;
+  --line:#D8D4CB; --line-soft:#E4E1D8;
+  --accent:#2438D6; --accent-tint:#E4E7FB; --accent-deep:#16247E;
+  --ok:#2E7D4F; --draft:#B98A2E;
+  --font-display:"Fraunces",Georgia,serif;
+  --font-grotesk:"Space Grotesk","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",Consolas,monospace;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:24px;--sp-6:32px;--sp-7:48px;--sp-8:64px;--sp-9:96px;
+  --ease:cubic-bezier(.22,1,.36,1); --dur:180ms;
+  --container:1280px; --gutter:clamp(20px,3.6vw,56px);
+}
+@media (prefers-reduced-motion:reduce){ :root{ --dur:1ms; } }
+*,*::before,*::after{ box-sizing:border-box; }
+html,body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--font-grotesk); font-size:15px; line-height:1.5; }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+input,select,textarea{ font:inherit; color:inherit; background:none; }
+ul{ margin:0; padding:0; list-style:none; }
+h1,h2,h3,p{ margin:0; }
+::selection{ background:var(--accent); color:var(--paper); }
+:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+.container{ max-width:var(--container); margin:0 auto; padding-left:var(--gutter); padding-right:var(--gutter); }
+.mono{ font-family:var(--font-mono); }
+.eyebrow{ font-family:var(--font-mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--graphite); }
+[hidden]{ display:none !important; }
+
+.jl-mark{ width:30px; height:30px; background:var(--ink); color:var(--paper); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:.82rem; flex:none; }
+
+/* ---------- Screens ---------- */
+.screen{ min-height:100vh; }
+
+/* ===== Login ===== */
+#screen-login{ display:flex; align-items:center; justify-content:center; padding:var(--sp-6); }
+.login-box{ width:100%; max-width:400px; }
+.login-mark{ margin-bottom:var(--sp-7); }
+.login-title{ font-family:var(--font-display); font-weight:600; font-size:clamp(2.2rem,4vw + 1rem,3rem); line-height:.98; letter-spacing:-.01em; margin-bottom:var(--sp-8); }
+.field{ margin-bottom:var(--sp-6); }
+.field label{ display:block; font-family:var(--font-mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase; color:var(--graphite); margin-bottom:var(--sp-2); }
+.field input,.field select,.field textarea{
+  width:100%; border:0; border-bottom:1px solid var(--line); padding:10px 2px; font-size:1rem;
+  transition:border-color var(--dur) var(--ease); background:transparent;
+}
+.field input:focus,.field select:focus,.field textarea:focus{ border-color:var(--ink); outline:none; }
+.field textarea{ resize:vertical; min-height:80px; border:1px solid var(--line); padding:10px; }
+.field textarea:focus{ border-color:var(--ink); }
+.btn{
+  display:inline-flex; align-items:center; gap:10px; font-family:var(--font-mono); font-size:.75rem;
+  letter-spacing:.08em; text-transform:uppercase; padding:13px 20px; border:1px solid var(--ink);
+  transition:background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.btn:hover{ background:var(--ink); color:var(--paper); }
+.btn.primary{ background:var(--ink); color:var(--paper); }
+.btn.primary:hover{ background:var(--accent-deep); border-color:var(--accent-deep); }
+.btn.ghost{ border-color:var(--line); }
+.btn.ghost:hover{ background:var(--ink); border-color:var(--ink); }
+.btn.full{ width:100%; justify-content:center; }
+.btn[disabled]{ opacity:.4; pointer-events:none; }
+.login-foot{ margin-top:var(--sp-7); font-family:var(--font-mono); font-size:.72rem; color:var(--graphite-2); }
+
+/* ===== Shell (post-login) ===== */
+#appShell[hidden]{ display:none; }
+.admin-header{ position:sticky; top:0; z-index:100; background:rgba(242,240,234,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line); }
+.admin-header-inner{ display:flex; align-items:center; gap:var(--sp-6); padding:var(--sp-3) var(--gutter); max-width:var(--container); margin:0 auto; }
+.admin-brand{ display:flex; align-items:center; gap:var(--sp-3); }
+.admin-brand-text{ font-family:var(--font-mono); font-size:.7rem; letter-spacing:.06em; text-transform:uppercase; line-height:1.3; }
+.admin-brand-text em{ display:block; font-style:normal; color:var(--graphite); }
+.admin-nav{ display:flex; gap:var(--sp-5); margin-right:auto; }
+.admin-nav button{
+  font-family:var(--font-mono); font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--graphite);
+  padding:6px 2px; border-bottom:2px solid transparent; transition:color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.admin-nav button.is-active,.admin-nav button:hover{ color:var(--ink); border-color:var(--accent); }
+.admin-header-actions{ display:flex; align-items:center; gap:var(--sp-5); font-family:var(--font-mono); font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; }
+.admin-header-actions a:hover,.admin-header-actions button:hover{ color:var(--accent); }
+
+.admin-view{ padding:var(--sp-7) 0 var(--sp-9); }
+.view-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:var(--sp-5); margin-bottom:var(--sp-6); flex-wrap:wrap; }
+.view-head h1{ font-family:var(--font-display); font-weight:600; font-size:clamp(1.7rem,2.4vw + 1rem,2.4rem); letter-spacing:-.01em; }
+
+/* ===== Stat row ===== */
+.stat-row{ display:grid; grid-template-columns:repeat(3,1fr); border:1px solid var(--line); margin-bottom:var(--sp-7); }
+.stat{ padding:var(--sp-5); border-right:1px solid var(--line); }
+.stat:last-child{ border-right:0; }
+.stat .stat-num{ font-family:var(--font-display); font-weight:600; font-size:2.2rem; letter-spacing:-.01em; }
+.stat .stat-label{ margin-top:4px; }
+@media (max-width:640px){ .stat-row{ grid-template-columns:1fr; } .stat{ border-right:0; border-bottom:1px solid var(--line); } .stat:last-child{ border-bottom:0; } }
+
+/* ===== Project table ===== */
+.table-head,.table-row{
+  display:grid; grid-template-columns:56px 1.4fr 110px 90px 130px 170px; gap:var(--sp-4); align-items:center;
+}
+.table-head{ font-family:var(--font-mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--graphite); padding-bottom:var(--sp-3); border-bottom:1px solid var(--ink); }
+.table-row{ padding:var(--sp-4) 0; border-bottom:1px solid var(--line-soft); transition:background var(--dur) var(--ease); }
+.table-row:hover{ background:var(--paper-2); }
+.table-row .t-title{ font-family:var(--font-display); font-weight:600; font-size:1.05rem; }
+.table-row .t-cat{ color:var(--graphite); font-family:var(--font-mono); font-size:.78rem; text-transform:uppercase; letter-spacing:.03em; }
+.status-pill{ display:inline-flex; align-items:center; gap:6px; font-family:var(--font-mono); font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; }
+.status-pill .dot{ width:6px; height:6px; border-radius:50%; }
+.status-pill.published .dot{ background:var(--ok); }
+.status-pill.draft .dot{ background:var(--draft); }
+.row-actions{ display:flex; gap:var(--sp-4); opacity:0; transition:opacity var(--dur) var(--ease); }
+.table-row:hover .row-actions,.table-row:focus-within .row-actions{ opacity:1; }
+.row-actions button{ font-family:var(--font-mono); font-size:.7rem; letter-spacing:.04em; text-transform:uppercase; color:var(--graphite); }
+.row-actions button:hover{ color:var(--accent); }
+@media (max-width:760px){
+  .table-head{ display:none; }
+  .table-row{ grid-template-columns:1fr; row-gap:var(--sp-2); padding:var(--sp-4); border:1px solid var(--line-soft); margin-bottom:var(--sp-3); }
+  .row-actions{ opacity:1; }
+}
+
+/* ===== Form (create/edit project) ===== */
+.form-grid{ display:grid; grid-template-columns:2fr 1fr; gap:var(--sp-8); align-items:start; }
+@media (max-width:900px){ .form-grid{ grid-template-columns:1fr; } }
+.form-section{ padding-bottom:var(--sp-7); margin-bottom:var(--sp-7); border-bottom:1px solid var(--line); }
+.form-section:last-child{ border-bottom:0; }
+.form-section .fs-label{ display:block; margin-bottom:var(--sp-4); }
+.form-row{ display:grid; grid-template-columns:2fr 1fr; gap:var(--sp-5); }
+@media (max-width:560px){ .form-row{ grid-template-columns:1fr; } }
+
+.chip-select{ display:flex; flex-wrap:wrap; gap:var(--sp-3); }
+.chip-select button{
+  font-family:var(--font-mono); font-size:.74rem; letter-spacing:.05em; text-transform:uppercase;
+  padding:8px 14px; border:1px solid var(--line); transition:all var(--dur) var(--ease);
+}
+.chip-select button.is-active{ border-color:var(--ink); background:var(--ink); color:var(--paper); }
+
+.segmented{ display:inline-flex; border:1px solid var(--ink); }
+.segmented button{ font-family:var(--font-mono); font-size:.72rem; letter-spacing:.06em; text-transform:uppercase; padding:9px 18px; }
+.segmented button.is-active{ background:var(--ink); color:var(--paper); }
+
+.dropzone{
+  border:1.4px dashed var(--line); aspect-ratio:16/10; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:var(--sp-2); text-align:center; cursor:pointer; transition:border-color var(--dur) var(--ease), background var(--dur) var(--ease);
+  background:var(--paper-3); position:relative; overflow:hidden;
+}
+.dropzone:hover{ border-color:var(--ink); }
+.dropzone img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.dropzone .dz-copy{ position:relative; z-index:1; }
+.dropzone .dz-copy span{ display:block; }
+.dropzone .dz-copy .dz-title{ font-family:var(--font-mono); font-size:.75rem; letter-spacing:.05em; text-transform:uppercase; }
+.dropzone .dz-copy .dz-sub{ font-size:.72rem; color:var(--graphite); margin-top:3px; }
+
+.gallery-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--sp-3); margin-top:var(--sp-4); }
+.gallery-tile{ position:relative; aspect-ratio:1/1; background:var(--paper-2); border:1px solid var(--line); overflow:hidden; }
+.gallery-tile img{ width:100%; height:100%; object-fit:cover; }
+.gallery-tile .grip{ position:absolute; top:6px; left:6px; font-family:var(--font-mono); font-size:.6rem; background:rgba(17,17,17,.75); color:var(--paper); padding:2px 5px; letter-spacing:.05em; }
+.gallery-tile .g-del{ position:absolute; top:6px; right:6px; width:20px; height:20px; background:rgba(17,17,17,.75); color:var(--paper); display:flex; align-items:center; justify-content:center; font-size:.7rem; }
+.gallery-tile.add{ display:flex; align-items:center; justify-content:center; border-style:dashed; cursor:pointer; }
+
+.sidebar-card{ border:1px solid var(--line); padding:var(--sp-5); margin-bottom:var(--sp-5); }
+.sidebar-card .sc-label{ display:block; margin-bottom:var(--sp-3); }
+
+.save-bar{
+  position:sticky; bottom:0; background:rgba(242,240,234,.95); backdrop-filter:blur(6px); border-top:1px solid var(--line);
+  padding:var(--sp-4) 0; display:flex; justify-content:space-between; align-items:center; gap:var(--sp-4); margin-top:var(--sp-7);
+}
+
+/* ===== Media library ===== */
+.media-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:var(--sp-4); }
+@media (max-width:900px){ .media-grid{ grid-template-columns:repeat(3,1fr); } }
+@media (max-width:560px){ .media-grid{ grid-template-columns:repeat(2,1fr); } }
+.media-tile{ position:relative; aspect-ratio:1/1; overflow:hidden; background:var(--ink); }
+.media-tile img{ width:100%; height:100%; object-fit:cover; }
+.media-tile .m-meta{ position:absolute; left:0; right:0; bottom:0; padding:8px 10px; background:linear-gradient(0deg,rgba(17,17,17,.82),transparent); color:var(--paper); font-family:var(--font-mono); font-size:.62rem; letter-spacing:.04em; }
+.media-tile .m-actions{ position:absolute; inset:0; background:rgba(17,17,17,.72); display:flex; align-items:center; justify-content:center; gap:var(--sp-4); opacity:0; transition:opacity var(--dur) var(--ease); }
+.media-tile:hover .m-actions{ opacity:1; }
+.media-tile .m-actions button{ font-family:var(--font-mono); font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--paper); border-bottom:1px solid transparent; }
+.media-tile .m-actions button:hover{ border-color:var(--paper); }
+.media-tile.upload{ background:var(--paper-3); border:1.4px dashed var(--line); display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--graphite); font-family:var(--font-mono); font-size:.72rem; letter-spacing:.05em; text-transform:uppercase; }
+.media-tile.upload:hover{ border-color:var(--ink); color:var(--ink); }
+
+/* Toast */
+.toast{
+  position:fixed; left:50%; bottom:32px; transform:translate(-50%,20px); background:var(--ink); color:var(--paper);
+  font-family:var(--font-mono); font-size:.78rem; letter-spacing:.04em; padding:12px 22px; opacity:0; pointer-events:none;
+  transition:opacity var(--dur) var(--ease), transform var(--dur) var(--ease); z-index:500;
+}
+.toast.is-visible{ opacity:1; transform:translate(-50%,0); }
+
+/* Placeholder artboards reused from public site tokens, simplified */
+.ph{ position:relative; width:100%; height:100%; }
+.ph::after{ content:attr(data-mark); position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-weight:700; font-size:2rem; }
+.ph-1{ background:linear-gradient(160deg,#171018,#2A1030,#3A0F1C); color:#F2EFEA; }
+.ph-2{ background:linear-gradient(125deg,#FF6A3D 0 52%,#F4D53B 52%); color:#171018; }
+.ph-3{ background:radial-gradient(120% 120% at 30% 20%,#FFE7A8,#F7B84B 55%,#E9862F); color:#3A1B08; }
+.ph-4{ background:#C15B3A; color:#F4ECE2; }
+.ph-5{ background:#FBFAF7; color:#111; }
+.ph-6{ background:conic-gradient(from 200deg at 32% 38%,#173E8C,#2E8C7A,#F4D53B,#C1483A,#173E8C); color:#F2EFEA; }
+</style>
+</head>
+<body>
+
+<!-- ============================= LOGIN ============================= -->
+<section class="screen" id="screen-login">
+  <div class="login-box">
+    <div class="login-mark jl-mark">JL</div>
+    <h1 class="login-title">Jonas /<br>Portfolio Admin</h1>
+    <form id="loginForm">
+      <div class="field"><label for="loginEmail">Email</label><input id="loginEmail" type="email" value="jonas.lacandola@jonasl.online" required></div>
+      <div class="field" style="margin-bottom:var(--sp-7)"><label for="loginPass">Password</label><input id="loginPass" type="password" value="••••••••••" required></div>
+      <button class="btn primary full" type="submit">Enter Studio <span>→</span></button>
+    </form>
+    <p class="login-foot">Prototype only — no authentication is performed.</p>
+  </div>
+</section>
+
+<!-- ============================= APP SHELL ============================= -->
+<div id="appShell" hidden>
+  <header class="admin-header">
+    <div class="admin-header-inner">
+      <div class="admin-brand">
+        <div class="jl-mark">JL</div>
+        <div class="admin-brand-text">Portfolio Admin<em>Jonas Lacandola</em></div>
+      </div>
+      <nav class="admin-nav">
+        <button data-screen="dashboard" class="is-active">Projects</button>
+        <button data-screen="media">Media</button>
+        <button data-screen="settings">Settings</button>
+      </nav>
+      <div class="admin-header-actions">
+        <a href="public-site.html" target="_blank" rel="noopener">View Site ↗</a>
+        <button id="signOutBtn">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== Dashboard ===== -->
+  <section class="screen admin-view" id="screen-dashboard">
+    <div class="container">
+      <div class="view-head">
+        <h1>Projects</h1>
+        <button class="btn primary" id="newProjectBtn">New Project <span>＋</span></button>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat"><p class="stat-num" id="statTotal">9</p><p class="stat-label eyebrow">Total Projects</p></div>
+        <div class="stat"><p class="stat-num" id="statPublished">6</p><p class="stat-label eyebrow">Published</p></div>
+        <div class="stat"><p class="stat-num" id="statDraft">3</p><p class="stat-label eyebrow">Draft</p></div>
+      </div>
+
+      <div class="table-head">
+        <span>No.</span><span>Title</span><span>Category</span><span>Year</span><span>Status</span><span></span>
+      </div>
+      <div id="projectTable"></div>
+    </div>
+  </section>
+
+  <!-- ===== Create / Edit Project ===== -->
+  <section class="screen admin-view" id="screen-editor" hidden>
+    <div class="container">
+      <div class="view-head">
+        <div>
+          <span class="eyebrow" id="editorEyebrow">New Project</span>
+          <h1 id="editorTitle" style="margin-top:6px">Untitled Project</h1>
+        </div>
+        <button class="btn ghost" data-screen="dashboard">← Back to Projects</button>
+      </div>
+
+      <form id="projectForm">
+        <div class="form-grid">
+          <div>
+            <div class="form-section">
+              <span class="fs-label eyebrow">Project Details</span>
+              <div class="form-row">
+                <div class="field"><label>Project Title</label><input id="f-title" type="text" value="Nightshift"></div>
+                <div class="field"><label>Slug</label><input id="f-slug" type="text" value="nightshift" class="mono"></div>
+              </div>
+              <div class="field"><label>Category</label>
+                <div class="chip-select" id="f-category">
+                  <button data-val="Poster" class="is-active">Poster</button>
+                  <button data-val="Social">Social</button>
+                  <button data-val="Merch">Merch</button>
+                  <button data-val="Brand">Brand</button>
+                  <button data-val="Experiment">Experiment</button>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="field"><label>Role</label><input id="f-role" type="text" value="Visual Design"></div>
+                <div class="field"><label>Year</label><input id="f-year" type="text" value="2026"></div>
+              </div>
+              <div class="field"><label>Tools / Discipline</label><input id="f-discipline" type="text" value="Poster / Typography"></div>
+              <div class="field"><label>Short Description</label><textarea id="f-short">A poster series for a recurring late-night music residency.</textarea></div>
+            </div>
+
+            <div class="form-section">
+              <span class="fs-label eyebrow">Project Context</span>
+              <div class="field"><label>The Brief</label><textarea id="f-brief">The residency needed a print identity that could run monthly without repeating itself.</textarea></div>
+              <div class="field"><label>The Direction</label><textarea id="f-direction">A single oversized numeral anchors every poster, paired with a tight grotesk and a narrow colour range.</textarea></div>
+              <div class="field"><label>The Result</label><textarea id="f-result">Six posters, one system — the numeral became the thing people photographed first.</textarea></div>
+            </div>
+
+            <div class="form-section">
+              <span class="fs-label eyebrow">Cover Image</span>
+              <div class="dropzone" id="coverDrop">
+                <div class="dz-copy"><span class="dz-title">Drop image or click to upload</span><span class="dz-sub">Recommended 2400 × 3000px, JPG or PNG</span></div>
+              </div>
+              <input type="file" id="coverInput" accept="image/*" hidden>
+            </div>
+
+            <div class="form-section" style="border-bottom:0">
+              <span class="fs-label eyebrow">Gallery Images</span>
+              <p style="color:var(--graphite);font-size:.85rem;margin-bottom:var(--sp-2)">Drag tiles to reorder how images appear on the project page.</p>
+              <div class="gallery-grid" id="galleryGrid">
+                <div class="gallery-tile"><div class="ph ph-1" data-mark=""></div><span class="grip">⠿</span><button class="g-del">✕</button></div>
+                <div class="gallery-tile"><div class="ph ph-4" data-mark=""></div><span class="grip">⠿</span><button class="g-del">✕</button></div>
+                <div class="gallery-tile"><div class="ph ph-6" data-mark=""></div><span class="grip">⠿</span><button class="g-del">✕</button></div>
+                <div class="gallery-tile add" id="galleryAdd">＋ Add</div>
+              </div>
+              <input type="file" id="galleryInput" accept="image/*" multiple hidden>
+            </div>
+          </div>
+
+          <div>
+            <div class="sidebar-card">
+              <span class="sc-label eyebrow">Status</span>
+              <div class="segmented" id="f-status">
+                <button data-val="Draft">Draft</button>
+                <button data-val="Published" class="is-active">Published</button>
+              </div>
+            </div>
+            <div class="sidebar-card">
+              <span class="sc-label eyebrow">Featured on Index</span>
+              <div class="segmented" id="f-featured">
+                <button data-val="No">No</button>
+                <button data-val="Yes" class="is-active">Yes</button>
+              </div>
+            </div>
+            <div class="sidebar-card">
+              <span class="sc-label eyebrow">Project Order</span>
+              <input id="f-order" type="number" value="1" style="border-bottom:1px solid var(--line);width:100%;padding:8px 2px;">
+            </div>
+            <div class="sidebar-card" style="border-color:var(--line-soft);background:var(--paper-3)">
+              <span class="sc-label eyebrow">Preview</span>
+              <div style="aspect-ratio:4/5" id="editorPreview"><div class="ph ph-1" data-mark="N"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="save-bar">
+          <button type="button" class="btn ghost" data-screen="dashboard">Cancel</button>
+          <div style="display:flex;gap:var(--sp-4)">
+            <button type="submit" class="btn ghost" id="saveDraftBtn">Save Draft</button>
+            <button type="submit" class="btn primary" id="publishBtn">Publish</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== Media Library ===== -->
+  <section class="screen admin-view" id="screen-media" hidden>
+    <div class="container">
+      <div class="view-head"><h1>Media Library</h1><span class="eyebrow" id="mediaCount">14 files</span></div>
+      <div class="media-grid" id="mediaGrid"></div>
+      <input type="file" id="mediaInput" accept="image/*" multiple hidden>
+    </div>
+  </section>
+
+  <!-- ===== Settings ===== -->
+  <section class="screen admin-view" id="screen-settings" hidden>
+    <div class="container" style="max-width:760px">
+      <div class="view-head"><h1>Settings</h1></div>
+      <form id="settingsForm">
+        <div class="form-section">
+          <span class="fs-label eyebrow">Profile</span>
+          <div class="form-row">
+            <div class="field"><label>Designer Name</label><input type="text" value="Jonas Lacandola"></div>
+            <div class="field"><label>Email</label><input type="email" value="jonas.lacandola@jonasl.online"></div>
+          </div>
+          <div class="field"><label>Availability Text</label><input type="text" value="Available for select projects — currently booking Q1 2027"></div>
+          <div class="field"><label>About Description</label><textarea style="min-height:120px">Jonas Lacandola is an independent visual designer working out of Pampanga, Philippines — building graphic systems for campaigns, posters, social content, merchandise and brand identities.</textarea></div>
+        </div>
+        <div class="form-section" style="border-bottom:0">
+          <span class="fs-label eyebrow">Social Links</span>
+          <div class="field"><label>Instagram</label><input type="text" value="instagram.com/jonaslacandola"></div>
+          <div class="field"><label>Behance</label><input type="text" value="behance.net/jonaslacandola"></div>
+          <div class="field"><label>LinkedIn</label><input type="text" value="linkedin.com/in/jonaslacandola"></div>
+        </div>
+        <div class="save-bar" style="justify-content:flex-end">
+          <button type="submit" class="btn primary">Save Settings</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+  function byId(id){ return document.getElementById(id); }
+
+  var projects = [
+    { num:'001', title:'Nightshift', category:'Poster', year:'2026', status:'Published', art:'ph-1' },
+    { num:'002', title:'Motion Energy', category:'Social', year:'2026', status:'Draft', art:'ph-2' },
+    { num:'003', title:'Kavanagh Summer', category:'Social', year:'2025', status:'Published', art:'ph-3' },
+    { num:'004', title:'Local Culture', category:'Merch', year:'2026', status:'Published', art:'ph-4' },
+    { num:'005', title:'Paper Trail', category:'Brand', year:'2025', status:'Published', art:'ph-5' },
+    { num:'006', title:'Static Bloom', category:'Experiment', year:'2026', status:'Draft', art:'ph-6' },
+    { num:'007', title:'Heatline', category:'Poster', year:'2025', status:'Published', art:'ph-1' },
+    { num:'008', title:'Signal Drift', category:'Merch', year:'2026', status:'Draft', art:'ph-4' },
+    { num:'009', title:'Grid Study 04', category:'Experiment', year:'2026', status:'Published', art:'ph-6' }
+  ];
+
+  /* ---------- Toast ---------- */
+  var toastTimer;
+  function showToast(msg){
+    var t = byId('toast'); t.textContent = msg; t.classList.add('is-visible');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.classList.remove('is-visible'); }, 2200);
+  }
+
+  /* ---------- Login ---------- */
+  byId('loginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    byId('screen-login').hidden = true;
+    byId('appShell').hidden = false;
+    showScreen('dashboard');
+  });
+  byId('signOutBtn').addEventListener('click', function(){
+    byId('appShell').hidden = true;
+    byId('screen-login').hidden = false;
+  });
+
+  /* ---------- Screen switching ---------- */
+  var screens = ['dashboard','editor','media','settings'];
+  function showScreen(name){
+    screens.forEach(function(s){ byId('screen-'+s).hidden = s !== name; });
+    document.querySelectorAll('.admin-nav button').forEach(function(b){
+      b.classList.toggle('is-active', b.getAttribute('data-screen')===name || (name==='editor' && b.getAttribute('data-screen')==='dashboard'));
+    });
+    window.scrollTo({top:0});
+  }
+  document.querySelectorAll('[data-screen]').forEach(function(btn){
+    btn.addEventListener('click', function(){ showScreen(btn.getAttribute('data-screen')); });
+  });
+
+  /* ---------- Dashboard table ---------- */
+  function renderTable(){
+    var el = byId('projectTable');
+    el.innerHTML = projects.map(function(p){
+      var cls = p.status.toLowerCase();
+      return '<div class="table-row">'+
+        '<span class="mono">'+p.num+'</span>'+
+        '<span class="t-title">'+p.title+'</span>'+
+        '<span class="t-cat">'+p.category+'</span>'+
+        '<span class="mono">'+p.year+'</span>'+
+        '<span class="status-pill '+cls+'"><span class="dot"></span>'+p.status+'</span>'+
+        '<span class="row-actions">'+
+          '<button data-act="edit" data-num="'+p.num+'">Edit</button>'+
+          '<button data-act="dup" data-num="'+p.num+'">Duplicate</button>'+
+          '<button data-act="archive" data-num="'+p.num+'">Archive</button>'+
+        '</span>'+
+      '</div>';
+    }).join('');
+
+    el.querySelectorAll('button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var act = btn.getAttribute('data-act');
+        var p = projects.find(function(pr){ return pr.num === btn.getAttribute('data-num'); });
+        if(act==='edit'){ openEditor(p); }
+        if(act==='dup'){ showToast('"'+p.title+'" duplicated as draft'); }
+        if(act==='archive'){ showToast('"'+p.title+'" moved to archive'); }
+      });
+    });
+
+    byId('statTotal').textContent = projects.length;
+    byId('statPublished').textContent = projects.filter(function(p){return p.status==='Published';}).length;
+    byId('statDraft').textContent = projects.filter(function(p){return p.status==='Draft';}).length;
+  }
+
+  /* ---------- Editor ---------- */
+  function openEditor(p){
+    byId('editorEyebrow').textContent = p ? 'Editing Project '+p.num : 'New Project';
+    byId('editorTitle').textContent = p ? p.title : 'Untitled Project';
+    byId('f-title').value = p ? p.title : '';
+    byId('f-slug').value = p ? p.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') : '';
+    byId('f-year').value = p ? p.year : new Date().getFullYear();
+    byId('f-role').value = p ? 'Visual Design' : '';
+    byId('f-discipline').value = '';
+    byId('f-short').value = '';
+    byId('f-brief').value=''; byId('f-direction').value=''; byId('f-result').value='';
+    document.querySelectorAll('#f-category button').forEach(function(b){ b.classList.toggle('is-active', p ? b.getAttribute('data-val')===p.category : b.getAttribute('data-val')==='Poster'); });
+    document.querySelectorAll('#f-status button').forEach(function(b){ b.classList.toggle('is-active', p ? b.getAttribute('data-val')===p.status : b.getAttribute('data-val')==='Draft'); });
+    var previewEl = byId('editorPreview');
+    previewEl.innerHTML = '<div class="ph '+(p?p.art:'ph-5')+'" data-mark="'+(p?p.title[0]:'?')+'"></div>';
+    showScreen('editor');
+  }
+  byId('newProjectBtn').addEventListener('click', function(){ openEditor(null); });
+
+  document.querySelectorAll('.chip-select').forEach(function(group){
+    group.addEventListener('click', function(e){
+      var btn = e.target.closest('button'); if(!btn) return;
+      group.querySelectorAll('button').forEach(function(b){ b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+    });
+  });
+  document.querySelectorAll('.segmented').forEach(function(group){
+    group.addEventListener('click', function(e){
+      var btn = e.target.closest('button'); if(!btn) return;
+      group.querySelectorAll('button').forEach(function(b){ b.classList.remove('is-active'); });
+      btn.classList.add('is-active');
+    });
+  });
+
+  byId('f-title').addEventListener('input', function(){
+    byId('f-slug').value = this.value.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
+    byId('editorTitle').textContent = this.value || 'Untitled Project';
+  });
+
+  byId('projectForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var isPublish = document.activeElement && document.activeElement.id === 'publishBtn';
+    showToast(isPublish ? 'Project published' : 'Draft saved');
+    showScreen('dashboard');
+  });
+
+  /* ---------- File previews (cover + gallery) ---------- */
+  byId('coverDrop').addEventListener('click', function(){ byId('coverInput').click(); });
+  byId('coverInput').addEventListener('change', function(e){
+    var file = e.target.files[0]; if(!file) return;
+    var url = URL.createObjectURL(file);
+    byId('coverDrop').innerHTML = '<img src="'+url+'" alt="">';
+  });
+  byId('galleryAdd').addEventListener('click', function(){ byId('galleryInput').click(); });
+  byId('galleryInput').addEventListener('change', function(e){
+    var files = Array.prototype.slice.call(e.target.files);
+    var grid = byId('galleryGrid'); var addTile = byId('galleryAdd');
+    files.forEach(function(file){
+      var url = URL.createObjectURL(file);
+      var tile = document.createElement('div');
+      tile.className = 'gallery-tile';
+      tile.innerHTML = '<img src="'+url+'" alt=""><span class="grip">⠿</span><button class="g-del">✕</button>';
+      grid.insertBefore(tile, addTile);
+    });
+  });
+  document.addEventListener('click', function(e){
+    if(e.target.classList.contains('g-del')){ e.target.closest('.gallery-tile').remove(); }
+  });
+
+  /* ---------- Media Library ---------- */
+  function renderMedia(){
+    var arts = ['ph-1','ph-2','ph-3','ph-4','ph-5','ph-6'];
+    var names = ['nightshift-01.jpg','motion-energy-cover.jpg','kavanagh-sun.jpg','local-culture-tee.jpg','paper-trail-mark.jpg','static-bloom-01.jpg','heatline-poster.jpg','signal-drift-print.jpg','grid-study-04.jpg','nightshift-crop.jpg','motion-energy-02.jpg','paper-trail-grid.jpg','static-bloom-02.jpg','archive-misc.jpg'];
+    var grid = byId('mediaGrid');
+    var tiles = names.map(function(n,i){
+      var art = arts[i % arts.length];
+      return '<div class="media-tile"><div class="ph '+art+'" data-mark=""></div>'+
+        '<div class="m-meta">'+n+' · 2.1MB</div>'+
+        '<div class="m-actions"><button>Replace</button><button>Delete</button></div></div>';
+    }).join('');
+    grid.innerHTML = tiles + '<div class="media-tile upload" id="mediaUploadTile">＋ Upload</div>';
+    byId('mediaCount').textContent = names.length + ' files';
+    byId('mediaUploadTile').addEventListener('click', function(){ byId('mediaInput').click(); });
+  }
+  byId('mediaInput').addEventListener('change', function(){ showToast('Files uploaded'); });
+
+  /* ---------- Settings ---------- */
+  byId('settingsForm').addEventListener('submit', function(e){ e.preventDefault(); showToast('Settings saved'); });
+
+  /* ---------- Init ---------- */
+  renderTable();
+  renderMedia();
+})();
+</script>
+</body>
+</html>
