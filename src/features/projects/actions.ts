@@ -59,6 +59,9 @@ export async function deleteProject(id: string, confirmation: string) {
 export async function reorderProjects(ids: string[]) {
   return execute(() => service.reorder(ids));
 }
+export async function reorderCategories(ids: string[]) {
+  return execute(() => service.reorderCategories(ids));
+}
 export async function saveSettings(data: unknown) {
   return execute(() => service.settings(data));
 }

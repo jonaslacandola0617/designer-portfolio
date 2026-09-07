@@ -4,10 +4,12 @@ import { useRouter } from "next/navigation";
 import type { Category, SiteSettings, MediaAsset } from "@prisma/client";
 import { Field } from "./field";
 import { Toast } from "./toast";
+import { SortableList } from "./sortable";
 import {
   saveSettings,
   saveCategory,
   deleteCategory,
+  reorderCategories,
 } from "@/features/projects/actions";
 
 const basic = [
@@ -161,112 +163,196 @@ export function SettingsEditor({
     </form>
   );
 }
+type CategoryWithCount = Category & { _count: { projects: number } };
+
+type CategoryFeedback =
+  | { kind: "success"; message: string }
+  | { kind: "error"; message: string }
+  | null;
+
 export function CategoryEditor({
   categories,
 }: {
-  categories: (Category & { _count: { projects: number } })[];
+  categories: CategoryWithCount[];
 }) {
+  const [items, setItems] = useState(categories);
+  const [snapshot, setSnapshot] = useState(categories);
+  const [feedback, setFeedback] = useState<CategoryFeedback>(null);
+  const [orderPending, startOrder] = useTransition();
+  const router = useRouter();
+
+  if (snapshot !== categories) {
+    setSnapshot(categories);
+    setItems(categories);
+  }
+
+  function reorder(next: CategoryWithCount[]) {
+    if (orderPending) return;
+    const previous = items;
+    setItems(next);
+    setFeedback(null);
+
+    startOrder(async () => {
+      const result = await reorderCategories(next.map((category) => category.id));
+
+      if (!result.ok) {
+        setItems(previous);
+        setFeedback({ kind: "error", message: result.error });
+        return;
+      }
+
+      setFeedback({ kind: "success", message: "Category order saved." });
+      router.refresh();
+    });
+  }
+
   return (
-    <section className="category-manager">
-      <div className="category-manager-head">
-        <div>
-          <span className="eyebrow">Taxonomy</span>
-          <h2>Categories</h2>
-        </div>
-        <span className="category-total">
-          {categories.length} {categories.length === 1 ? "category" : "categories"}
+    <section className="category-manager" aria-busy={orderPending}>
+      <div className="category-manager-meta">
+        <span>
+          {items.length} {items.length === 1 ? "category" : "categories"}
         </span>
+        <span>Drag to reorder / saves automatically</span>
       </div>
 
-      <div className="category-list">
-        {categories.map((category) => (
-          <CategoryForm
-            key={`${category.id}-${category.updatedAt.toISOString()}`}
-            category={category}
-          />
-        ))}
+      <div className="category-table-head" aria-hidden="true">
+        <span>Move</span>
+        <span>Category</span>
+        <span>Slug</span>
+        <span>Usage</span>
+        <span>Actions</span>
       </div>
 
-      <div className="category-add">
-        <div className="category-add-head">
-          <span className="eyebrow">New category</span>
-          <h3>Add category</h3>
-        </div>
-        <CategoryForm />
+      <fieldset disabled={orderPending} className="plain-fieldset category-sortable">
+        <SortableList items={items} onChange={reorder}>
+          {(category, handle) => (
+            <CategoryForm
+              category={category}
+              handle={handle}
+              onFeedback={setFeedback}
+            />
+          )}
+        </SortableList>
+      </fieldset>
+
+      <div className="category-new-label">
+        <span className="eyebrow">Add category</span>
       </div>
+      <CategoryForm
+        createSortOrder={items.length}
+        onFeedback={setFeedback}
+      />
+
+      <Toast
+        message={feedback?.kind === "success" ? feedback.message : ""}
+      />
+      {feedback?.kind === "error" && (
+        <p role="status" className="notice category-error">
+          {feedback.message}
+        </p>
+      )}
     </section>
   );
 }
 
 function CategoryForm({
   category,
+  handle,
+  createSortOrder = 0,
+  onFeedback,
 }: {
-  category?: Category & { _count: { projects: number } };
+  category?: CategoryWithCount;
+  handle?: React.ReactNode;
+  createSortOrder?: number;
+  onFeedback: (feedback: CategoryFeedback) => void;
 }) {
-  const [message, setMessage] = useState("");
   const [pending, start] = useTransition();
   const router = useRouter();
   const projectCount = category?._count.projects ?? 0;
   const isInUse = projectCount > 0;
+  const idBase = category?.id ?? "new-category";
 
   return (
     <form
-      className={`category-form${category ? "" : " is-new"}`}
-      onSubmit={(e) => {
-        e.preventDefault();
-        const element = e.currentTarget;
+      className={`category-row${category ? "" : " is-new"}`}
+      onSubmit={(event) => {
+        event.preventDefault();
+        const element = event.currentTarget;
         const data = new FormData(element);
 
         start(async () => {
           const result = await saveCategory(category?.id ?? null, {
             name: data.get("name"),
             slug: data.get("slug"),
-            sortOrder: Number(data.get("sortOrder")),
+            sortOrder: category?.sortOrder ?? createSortOrder,
           });
 
-          setMessage(result.ok ? "Category saved." : result.error);
-
-          if (result.ok) {
-            if (!category) element.reset();
-            router.refresh();
+          if (!result.ok) {
+            onFeedback({ kind: "error", message: result.error });
+            return;
           }
+
+          onFeedback({
+            kind: "success",
+            message: category ? "Category saved." : "Category added.",
+          });
+
+          if (!category) element.reset();
+          router.refresh();
         });
       }}
     >
-      {category && (
-        <div className="category-form-head">
-          <span className="category-form-title">{category.name}</span>
-          <span className={`category-usage${isInUse ? " is-used" : ""}`}>
-            <span className="category-usage-dot" aria-hidden="true" />
-            {projectCount} {projectCount === 1 ? "project" : "projects"}
+      <div className="category-handle-cell">
+        {category ? (
+          handle
+        ) : (
+          <span className="category-new-mark" aria-hidden="true">
+            +
           </span>
-        </div>
-      )}
+        )}
+      </div>
 
-      <div className="category-fields">
-        <Field
-          label="Category name"
+      <div className="category-inline-field">
+        <label htmlFor={`${idBase}-name`}>Category name</label>
+        <input
+          id={`${idBase}-name`}
           name="name"
-          value={category?.name}
+          defaultValue={category?.name}
+          placeholder={category ? undefined : "Category name"}
           required
-        />
-        <Field
-          label="Category slug"
-          name="slug"
-          value={category?.slug}
-          required
-        />
-        <Field
-          label="Order"
-          name="sortOrder"
-          value={category?.sortOrder ?? 0}
-          type="number"
+          maxLength={100}
         />
       </div>
 
-      <div className="category-actions">
-        <button disabled={pending} className="category-save">
-          {category ? "Save changes" : "Add category"}
+      <div className="category-inline-field">
+        <label htmlFor={`${idBase}-slug`}>Category slug</label>
+        <input
+          id={`${idBase}-slug`}
+          className="category-slug-input"
+          name="slug"
+          defaultValue={category?.slug}
+          placeholder={category ? undefined : "category-slug"}
+          required
+          maxLength={100}
+          pattern="[a-z0-9]+(?:-[a-z0-9]+)*"
+          title="Use lowercase letters, numbers and single hyphens."
+        />
+      </div>
+
+      <div className="category-usage">
+        {category ? (
+          <>
+            <span className="category-usage-dot" aria-hidden="true" />
+            {projectCount} {projectCount === 1 ? "project" : "projects"}
+          </>
+        ) : (
+          "New"
+        )}
+      </div>
+
+      <div className="category-row-actions">
+        <button type="submit" disabled={pending} className="category-save">
+          {pending ? "Saving…" : category ? "Save" : "Add"}
         </button>
 
         {category && (
@@ -287,29 +373,25 @@ function CategoryForm({
               ) {
                 start(async () => {
                   const result = await deleteCategory(category.id);
-                  setMessage(result.ok ? "Category deleted." : result.error);
+
+                  if (!result.ok) {
+                    onFeedback({ kind: "error", message: result.error });
+                    return;
+                  }
+
+                  onFeedback({
+                    kind: "success",
+                    message: "Category deleted.",
+                  });
                   router.refresh();
                 });
               }
             }}
           >
-            {isInUse ? "In use" : "Delete category"}
+            Delete
           </button>
         )}
       </div>
-
-      {message && (
-        <p
-          role="status"
-          className={
-            message === "Category saved." || message === "Category deleted."
-              ? "category-message"
-              : "category-message is-error"
-          }
-        >
-          {message}
-        </p>
-      )}
     </form>
   );
 }

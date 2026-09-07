@@ -140,6 +140,23 @@ export function projectService(
         );
       });
     },
+    async reorderCategories(ids: string[]) {
+      await authorize();
+      if (ids.length > 1000) throw new DomainError("Too many categories.");
+      ids.forEach((id) => idSchema.parse(id));
+      return transaction(async (tx) => {
+        const rows = await tx.category.findMany({ select: { id: true } });
+        const order = validateOrder(
+          ids,
+          rows.map((category) => category.id),
+        );
+        await Promise.all(
+          order.map(({ id, sortOrder }) =>
+            tx.category.update({ where: { id }, data: { sortOrder } }),
+          ),
+        );
+      });
+    },
     async settings(input: unknown) {
       await authorize();
       const data = settingsSchema.parse(input);
@@ -152,9 +169,27 @@ export function projectService(
     async category(id: string | null, input: unknown) {
       await authorize();
       const data = categorySchema.parse(input);
-      return id
-        ? db.category.update({ where: { id: idSchema.parse(id) }, data })
-        : db.category.create({ data });
+
+      if (id) {
+        const { sortOrder: _sortOrder, ...editable } = data;
+        void _sortOrder;
+        return db.category.update({
+          where: { id: idSchema.parse(id) },
+          data: editable,
+        });
+      }
+
+      return transaction(async (tx) => {
+        const latest = await tx.category.aggregate({
+          _max: { sortOrder: true },
+        });
+        return tx.category.create({
+          data: {
+            ...data,
+            sortOrder: (latest._max.sortOrder ?? -1) + 1,
+          },
+        });
+      });
     },
     async removeCategory(id: string) {
       await authorize();
