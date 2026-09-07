@@ -38,6 +38,7 @@ import {
   completeUpload,
   updateAlt,
   removeMedia,
+  removeMediaBulk,
   retryStorageDeletions,
   replaceMedia,
 } from "@/features/media/actions";
@@ -68,7 +69,8 @@ describe.sequential("media ownership and deletion", () => {
       () => requestUpload(metadata),
       () => completeUpload("id", ""),
       () => updateAlt("id", "alt"),
-      () => removeMedia("id", "name"),
+      () => removeMedia("id"),
+      () => removeMediaBulk(["id"]),
       () => retryStorageDeletions(),
       () => replaceMedia("id","replacement"),
     ])
@@ -114,7 +116,7 @@ describe.sequential("media ownership and deletion", () => {
         },
       })
     ).id;
-    await expect(removeMedia(assetId, "test.png")).rejects.toThrow();
+    await expect(removeMedia(assetId)).rejects.toThrow();
     expect(await db.mediaAsset.count({ where: { id: assetId } })).toBe(1);
     await db.project.update({
       where: { id: projectId },
@@ -125,9 +127,8 @@ describe.sequential("media ownership and deletion", () => {
     const key = (
       await db.mediaAsset.findUniqueOrThrow({ where: { id: assetId } })
     ).storageKey;
-    await expect(removeMedia(assetId, "wrong")).rejects.toThrow("confirm");
     state.failDelete = true;
-    await removeMedia(assetId, "test.png");
+    await removeMedia(assetId);
     expect(await db.mediaAsset.count({ where: { id: assetId } })).toBe(0);
     expect(await db.storageDeletion.count({ where: { storageKey: key } })).toBe(
       1,
