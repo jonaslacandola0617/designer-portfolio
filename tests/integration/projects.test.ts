@@ -79,6 +79,7 @@ describe.sequential("project persistence and authorization", () => {
       () => denied.archive("anything"),
       () => denied.remove("anything", "anything"),
       () => denied.reorder([]),
+      () => denied.reorderCategories([]),
       () => denied.settings({}),
       () => denied.category(null, {}),
       () => denied.removeCategory("anything"),
@@ -174,6 +175,29 @@ describe.sequential("project persistence and authorization", () => {
     ).toEqual(ids);
     await expect(service.reorder([projectIds[0]])).rejects.toThrow("Refresh");
   });
+  it("persists complete category ordering and rejects stale lists", async () => {
+    const existing = await db.category.findMany({
+      orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+      select: { id: true },
+    });
+    const ids = existing.map((category) => category.id).reverse();
+
+    await service.reorderCategories(ids);
+
+    expect(
+      (
+        await db.category.findMany({
+          orderBy: [{ sortOrder: "asc" }, { id: "asc" }],
+          select: { id: true },
+        })
+      ).map((category) => category.id),
+    ).toEqual(ids);
+
+    await expect(service.reorderCategories([categoryId])).rejects.toThrow(
+      "Refresh",
+    );
+  });
+
   it("archives and restores to draft without deleting artwork", async () => {
     await service.archive(projectIds[0]);
     expect(
