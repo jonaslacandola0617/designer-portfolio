@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { getSiteSettings } from "@/features/projects/queries";
 import { pageMetadata } from "@/lib/seo";
+
 export async function generateMetadata() {
   const s = await getSiteSettings();
   return pageMetadata(
-    "About",
+    `About — ${s.professionalTitle}`,
     s.shortBio || s.defaultSeoDescription,
     "/about",
-    s.socialImage?.url,
+    s.socialImage,
+    `${s.designerName} — ${s.professionalTitle}`,
   );
 }
+
 export default async function About() {
   const s = await getSiteSettings();
   return (

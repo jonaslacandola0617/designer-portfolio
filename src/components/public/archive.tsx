@@ -76,7 +76,11 @@ export function Archive({
               href={`/work/${p.slug}`}
               data-cursor="View Project"
             >
-              <Artboard image={p.coverImage} aspect={p.artworkAspect} />
+              <Artboard
+                image={p.coverImage}
+                aspect={p.artworkAspect}
+                altFallback={`${p.title} — ${p.category.name} project cover`}
+              />
               <div className="frame-meta">
                 <span className="frame-title">{p.title}</span>
                 <span>
