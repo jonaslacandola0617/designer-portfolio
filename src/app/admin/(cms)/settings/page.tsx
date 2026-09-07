@@ -17,7 +17,7 @@ export default async function Settings() {
         <h1>Settings</h1>
       </div>
       <SettingsEditor settings={settings} media={media} />
-      <details>
+      <details className="category-details">
         <summary>Manage categories</summary>
         <CategoryEditor categories={categories} />
       </details>
