@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import type { Category, SiteSettings, MediaAsset } from "@prisma/client";
 import { Field } from "./field";
@@ -176,13 +176,15 @@ export function CategoryEditor({
   categories: CategoryWithCount[];
 }) {
   const [items, setItems] = useState(categories);
+  const [snapshot, setSnapshot] = useState(categories);
   const [feedback, setFeedback] = useState<CategoryFeedback>(null);
   const [orderPending, startOrder] = useTransition();
   const router = useRouter();
 
-  useEffect(() => {
+  if (snapshot !== categories) {
+    setSnapshot(categories);
     setItems(categories);
-  }, [categories]);
+  }
 
   function reorder(next: CategoryWithCount[]) {
     if (orderPending) return;
