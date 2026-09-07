@@ -6,23 +6,29 @@ import type {
   PublicProjectDetail,
   PublicSiteSettings,
 } from "@/features/projects/types";
+
 export const archiveNumber = (number: number) =>
   String(number).padStart(3, "0");
+
 export function Artboard({
   image,
   aspect = "PORTRAIT",
   priority = false,
+  altFallback = "",
 }: {
   image: PublicImage | null;
   aspect?: string;
   priority?: boolean;
+  altFallback?: string;
 }) {
+  const alt = image?.altText.trim() || altFallback;
+
   return (
     <div className="artboard" data-aspect={aspect}>
       {image && (
         <Image
           src={image.url}
-          alt={image.altText}
+          alt={alt}
           width={image.width ?? 1200}
           height={image.height ?? 1500}
           sizes="(max-width:700px) 100vw, (max-width:1024px) 80vw, 1100px"
@@ -32,6 +38,7 @@ export function Artboard({
     </div>
   );
 }
+
 export function WorkRow({
   project: p,
   paired,
@@ -53,7 +60,11 @@ export function WorkRow({
               href={`/work/${p.slug}`}
               data-cursor="View Project"
             >
-              <Artboard image={p.coverImage} aspect="SQUARE" />
+              <Artboard
+                image={p.coverImage}
+                aspect="SQUARE"
+                altFallback={`${p.title} — ${p.category.name} project cover`}
+              />
             </Link>
             {paired && (
               <Link
@@ -62,7 +73,11 @@ export function WorkRow({
                 data-cursor="View Project"
                 style={{ marginTop: "var(--sp-8)" }}
               >
-                <Artboard image={paired.coverImage} aspect="SQUARE" />
+                <Artboard
+                  image={paired.coverImage}
+                  aspect="SQUARE"
+                  altFallback={`${paired.title} — ${paired.category.name} project cover`}
+                />
               </Link>
             )}
           </div>
@@ -75,6 +90,7 @@ export function WorkRow({
             <Artboard
               image={p.coverImage}
               aspect={v === "a" ? "PORTRAIT" : "LANDSCAPE"}
+              altFallback={`${p.title} — ${p.category.name} project cover`}
             />
           </Link>
         )}
@@ -118,6 +134,7 @@ export function WorkRow({
     </article>
   );
 }
+
 export function SocialLinks({ settings: s }: { settings: PublicSiteSettings }) {
   return (
     <>
@@ -136,6 +153,7 @@ export function SocialLinks({ settings: s }: { settings: PublicSiteSettings }) {
     </>
   );
 }
+
 export function ProjectPresentation({
   project: p,
   next,
@@ -188,7 +206,12 @@ export function ProjectPresentation({
         </div>
       </div>
       <div className="container project-hero">
-        <Artboard image={p.coverImage} aspect="WIDE" priority />
+        <Artboard
+          image={p.coverImage}
+          aspect="WIDE"
+          priority
+          altFallback={`${p.title} — ${p.category.name} project cover`}
+        />
       </div>
       <div className="container project-narrative">
         {[
@@ -212,6 +235,11 @@ export function ProjectPresentation({
             <Artboard
               image={g.media}
               aspect={g.layout === "WIDE" ? "LANDSCAPE" : "PORTRAIT"}
+              altFallback={
+                g.caption
+                  ? `${p.title} — ${g.caption}`
+                  : `${p.title} project artwork`
+              }
             />
             {g.caption && (
               <figcaption
@@ -234,7 +262,10 @@ export function ProjectPresentation({
               </span>
               <h3 className="np-title">{next.title}</h3>
             </div>
-            <Artboard image={next.coverImage} />
+            <Artboard
+              image={next.coverImage}
+              altFallback={`${next.title} — ${next.category.name} project cover`}
+            />
           </Link>
         </div>
       )}
