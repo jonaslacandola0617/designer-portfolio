@@ -167,19 +167,37 @@ export function CategoryEditor({
   categories: (Category & { _count: { projects: number } })[];
 }) {
   return (
-    <section className="stack">
-      <h2>Categories</h2>
-      {categories.map((c) => (
-        <CategoryForm
-          key={`${c.id}-${c.updatedAt.toISOString()}`}
-          category={c}
-        />
-      ))}
-      <h3>Add category</h3>
-      <CategoryForm />
+    <section className="category-manager">
+      <div className="category-manager-head">
+        <div>
+          <span className="eyebrow">Taxonomy</span>
+          <h2>Categories</h2>
+        </div>
+        <span className="category-total">
+          {categories.length} {categories.length === 1 ? "category" : "categories"}
+        </span>
+      </div>
+
+      <div className="category-list">
+        {categories.map((category) => (
+          <CategoryForm
+            key={`${category.id}-${category.updatedAt.toISOString()}`}
+            category={category}
+          />
+        ))}
+      </div>
+
+      <div className="category-add">
+        <div className="category-add-head">
+          <span className="eyebrow">New category</span>
+          <h3>Add category</h3>
+        </div>
+        <CategoryForm />
+      </div>
     </section>
   );
 }
+
 function CategoryForm({
   category,
 }: {
@@ -188,20 +206,26 @@ function CategoryForm({
   const [message, setMessage] = useState("");
   const [pending, start] = useTransition();
   const router = useRouter();
+  const projectCount = category?._count.projects ?? 0;
+  const isInUse = projectCount > 0;
+
   return (
     <form
-      className="stack"
+      className={`category-form${category ? "" : " is-new"}`}
       onSubmit={(e) => {
         e.preventDefault();
         const element = e.currentTarget;
         const data = new FormData(element);
+
         start(async () => {
           const result = await saveCategory(category?.id ?? null, {
             name: data.get("name"),
             slug: data.get("slug"),
             sortOrder: Number(data.get("sortOrder")),
           });
+
           setMessage(result.ok ? "Category saved." : result.error);
+
           if (result.ok) {
             if (!category) element.reset();
             router.refresh();
@@ -209,7 +233,17 @@ function CategoryForm({
         });
       }}
     >
-      <div className="form-grid">
+      {category && (
+        <div className="category-form-head">
+          <span className="category-form-title">{category.name}</span>
+          <span className={`category-usage${isInUse ? " is-used" : ""}`}>
+            <span className="category-usage-dot" aria-hidden="true" />
+            {projectCount} {projectCount === 1 ? "project" : "projects"}
+          </span>
+        </div>
+      )}
+
+      <div className="category-fields">
         <Field
           label="Category name"
           name="name"
@@ -223,43 +257,59 @@ function CategoryForm({
           required
         />
         <Field
-          label="Category order"
+          label="Order"
           name="sortOrder"
           value={category?.sortOrder ?? 0}
           type="number"
         />
       </div>
-      <div className="actions">
-        <button disabled={pending} className="secondary">
-          {category ? "Save category" : "Add category"}
+
+      <div className="category-actions">
+        <button disabled={pending} className="category-save">
+          {category ? "Save changes" : "Add category"}
         </button>
+
         {category && (
-          <>
-            <span>{category._count.projects} projects</span>
-            <button
-              className="danger"
-              type="button"
-              disabled={pending || category._count.projects > 0}
-              onClick={() => {
-                if (
-                  window.confirm(
-                    `Delete the unused category “${category.name}”?`,
-                  )
+          <button
+            className="category-delete"
+            type="button"
+            disabled={pending || isInUse}
+            title={
+              isInUse
+                ? "Move or remove projects from this category before deleting it."
+                : "Delete this unused category."
+            }
+            onClick={() => {
+              if (
+                window.confirm(
+                  `Delete the unused category “${category.name}”?`,
                 )
-                  start(async () => {
-                    const result = await deleteCategory(category.id);
-                    setMessage(result.ok ? "Category deleted." : result.error);
-                    router.refresh();
-                  });
-              }}
-            >
-              Delete category
-            </button>
-          </>
+              ) {
+                start(async () => {
+                  const result = await deleteCategory(category.id);
+                  setMessage(result.ok ? "Category deleted." : result.error);
+                  router.refresh();
+                });
+              }
+            }}
+          >
+            {isInUse ? "In use" : "Delete category"}
+          </button>
         )}
       </div>
-      {message && <p role="status">{message}</p>}
-      <hr />
+
+      {message && (
+        <p
+          role="status"
+          className={
+            message === "Category saved." || message === "Category deleted."
+              ? "category-message"
+              : "category-message is-error"
+          }
+        >
+          {message}
+        </p>
+      )}
     </form>
   );
 }
