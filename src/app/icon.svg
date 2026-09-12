@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title>JL — Jonas Lacandola</title>
-  <rect width="64" height="64" fill="#F2F0EA"/>
-  <rect x="5" y="5" width="54" height="54" fill="none" stroke="#111111" stroke-width="2"/>
-  <text x="32" y="39" text-anchor="middle" fill="#111111" font-family="Fraunces, Georgia, serif" font-size="25" font-weight="700" letter-spacing="-1">JL</text>
-  <circle cx="52" cy="12" r="2.5" fill="#2438D6"/>
+  <title>JL/ — Jonas Lacandola</title>
+  <rect width="64" height="64" fill="#0B0C0C"/>
+  <path d="M12 16H27V39C27 46.5 23 50 17 50H12" fill="none" stroke="#F4EFE6" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter"/>
+  <path d="M35 16V50H50" fill="none" stroke="#F4EFE6" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter"/>
+  <path d="M49 19L57 11" fill="none" stroke="#C94A31" stroke-width="5" stroke-linecap="square"/>
 </svg>
