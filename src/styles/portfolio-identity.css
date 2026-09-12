@@ -9,6 +9,11 @@
 
 :root,
 .register-public {
+  --font-display: var(--register-playfair), "Playfair Display", Georgia, serif;
+  --font-grotesk: var(--register-manrope), Manrope, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-mono: var(--register-mono), "IBM Plex Mono", "SFMono-Regular",
+    Consolas, monospace;
   --paper: #eee8dc;
   --paper-2: #e3dccf;
   --paper-3: #f6f1e8;
@@ -29,6 +34,10 @@
 }
 
 .register-admin {
+  --font-display: var(--register-playfair), "Playfair Display", Georgia, serif;
+  --font-grotesk: var(--register-manrope), Manrope, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-mono: var(--register-mono), "IBM Plex Mono", Consolas, monospace;
   --paper: #eee8dc;
   --paper-2: #e3dccf;
   --paper-3: #f6f1e8;
