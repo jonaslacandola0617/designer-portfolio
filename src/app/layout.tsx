@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { siteUrl } from "@/lib/seo";
 import "./globals.css";
-import { fraunces, grotesk, mono } from "@/lib/fonts";
+import { manrope, mono, playfair } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en-PH"
-      className={`${fraunces.variable} ${grotesk.variable} ${mono.variable}`}
+      className={`${manrope.variable} ${playfair.variable} ${mono.variable}`}
     >
       <body>
         <a className="skip-link" href="#main">
